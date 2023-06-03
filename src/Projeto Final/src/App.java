@@ -54,25 +54,26 @@ public class App extends Application {
             }
         }
 
-        // Thread t = new Thread(new Runnable() {
-        //     @Override
-        //     public void run() {
-        //         if(gameState == 1) {
-        //             System.out.println("AAAAAAAAAAAAAAAAAAAAAA");
-        //             while(true) {
-        //                 System.out.println("OOOOOOOOOOOOOOOOO");
-        //                 String string = clientSideConnection.receiveMessage();
-        //                 int playerToMove;
-        //                 double attack;
-        //                 playerToMove = Integer.parseInt(string.substring(13, 14));
-        //                 attack = Double.parseDouble(string.substring(15));
-        //                 System.out.println("Player #" + playerToMove + " hit " + attack + " attack value.");
-        //                 players[playerToMove].setX(players[playerToMove].getX() + (0.5 - attack) * CAR_SPEED);
-        //             }
-        //         }
-        //     }
-        // });
-        // t.start();
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                    while(true){
+                        String string;
+                        if((string = clientSideConnection.receiveMessage())!=null) {
+                            System.out.println(string);
+                            int playerToMove;
+                            double attack;
+                            playerToMove = Integer.parseInt(string.substring(14, 15));
+                            attack = Double.parseDouble(string.substring(16));
+                            System.out.println("Player #" + playerToMove + " hit " + attack + " attack value.");
+                            players[playerToMove - 1].setX(players[playerToMove - 1].getX() + (0.5 - attack) * CAR_SPEED);
+                        }
+                    }
+                
+            }
+        });
+        t.start();
 
         // Creating gameRunning scene
         paneGameRunning = new Pane();
@@ -111,16 +112,16 @@ public class App extends Application {
                     double attackValue = Math.abs(((double) box.getSlider().getEndX() - boxInitPosX) - BOX_WIDTH / 2) / (BOX_WIDTH / 2);
                     // System.out.println("Attack power: " + (1 - attackValue));
 
-                    // move the player1 based on the attack value
+                    // move the player based on the attack value
                     // players[playerID].setX(players[playerID].getX() + (0.5 - attackValue) * CAR_SPEED);
-                    clientSideConnection.sendMessage(playerID + " " + (1 - attackValue));
+                    clientSideConnection.sendMessage(playerID + " " + (0.5 - attackValue));
                 }
                 
             }
         });
 
         // Animation to move the slider
-        new AnimationTimer() {
+        AnimationTimer slider = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (box.isMovingRight()) {
@@ -136,7 +137,9 @@ public class App extends Application {
                 }
                 
             }
-        }.start();
+        };
+
+        slider.start();
 
         primaryStage.setScene(gameRunning);
         primaryStage.show();

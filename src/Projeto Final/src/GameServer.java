@@ -87,9 +87,7 @@ public class GameServer {
                             playerToMove = Integer.parseInt(string.substring(15, 16));
                             attack = Double.parseDouble(string.substring(17));
                             for(int i = 0; i < numPlayers; i++) {
-                                if(playerToMove == i) {
-                                    sendMessage(playerID + " " + attack);
-                                }
+                                players[i].sendMessage(playerToMove + " " + attack);
                             }
                         }
                     }
@@ -134,10 +132,10 @@ public class GameServer {
 
     public static void main(String[] args) {
         System.out.println("Escreva quantos players são!");
-        Scanner scan = new Scanner(System.in);
-        int nP = scan.nextInt();
-        scan.close();
-        GameServer gameServer = new GameServer(nP);
+        // Scanner scan = new Scanner(System.in);
+        // int nP = scan.nextInt();
+        // scan.close();
+        GameServer gameServer = new GameServer(3);
         gameServer.acceptConnections();
     }
 }

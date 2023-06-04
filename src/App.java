@@ -122,8 +122,13 @@ public class App extends Application {
 
         // Animation to move the slider
         AnimationTimer slider = new AnimationTimer() {
+            private long lastUpdate = 0 ;
             @Override
             public void handle(long now) {
+                if (now - lastUpdate <= 17_000_000) {
+                    return;
+                }
+                lastUpdate = now ;
                 if (box.isMovingRight()) {
                     box.setSliderPosX(box.getSliderPosX() + SLIDER_SPEED);
                     if (box.getSlider().getEndX() >= BOX_WIDTH + boxInitPosX) {

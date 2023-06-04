@@ -4,7 +4,24 @@ import javafx.scene.image.ImageView;
 public class Car extends ImageView {
 
     double speed;
+    double currentX, currentY;
     
+    public double getCurrentX() {
+        return currentX;
+    }
+
+    public void setCurrentX(double currentX) {
+        this.currentX = currentX;
+    }
+
+    public double getCurrentY() {
+        return currentY;
+    }
+
+    public void setCurrentY(double currentY) {
+        this.currentY = currentY;
+    }
+
     public Car() {
 
     }
@@ -16,6 +33,8 @@ public class Car extends ImageView {
         this.setY(positionY);
         this.setFitWidth(width);
         this.setFitHeight(height);
+        this.currentX = positionX;
+        this.currentY = positionX;
     }
 
     public double getSpeed() {

@@ -132,10 +132,10 @@ public class GameServer {
 
     public static void main(String[] args) {
         System.out.println("Escreva quantos players são!");
-        // Scanner scan = new Scanner(System.in);
-        // int nP = scan.nextInt();
-        // scan.close();
-        GameServer gameServer = new GameServer(3);
+        Scanner scan = new Scanner(System.in);
+        int nP = scan.nextInt();
+        scan.close();
+        GameServer gameServer = new GameServer(nP);
         gameServer.acceptConnections();
     }
 }

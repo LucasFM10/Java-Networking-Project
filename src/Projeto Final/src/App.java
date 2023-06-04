@@ -61,13 +61,13 @@ public class App extends Application {
                     while(true){
                         String string;
                         if((string = clientSideConnection.receiveMessage())!=null) {
-                            System.out.println(string);
-                            int playerToMove;
-                            double attack;
-                            playerToMove = Integer.parseInt(string.substring(14, 15));
-                            attack = Double.parseDouble(string.substring(16));
-                            System.out.println("Player #" + playerToMove + " hit " + attack + " attack value.");
-                            players[playerToMove - 1].setX(players[playerToMove - 1].getX() + (0.5 - attack) * CAR_SPEED);
+                        System.out.println(string);
+                        int playerToMove;
+                        double attack;
+                        playerToMove = Integer.parseInt(string.substring(14, 15));
+                        attack = Double.parseDouble(string.substring(16));
+                        System.out.println("Player #" + playerToMove + " hit " + attack + " attack value.");
+                        players[playerToMove - 1].setCurrentX(players[playerToMove - 1].getX() + (attack) * CAR_SPEED);
                         }
                     }
                 
@@ -134,6 +134,10 @@ public class App extends Application {
                     if (box.getSlider().getEndX() <= + boxInitPosX) {
                         box.setMovingRight(true);
                     }
+                }
+                
+                for(int i = 0; i < numPlayers; i++) {
+                    players[i].setX(players[i].getCurrentX());
                 }
                 
             }

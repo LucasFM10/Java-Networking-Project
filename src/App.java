@@ -1,5 +1,3 @@
-// utilizando o git para comentar o código!
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -48,8 +46,8 @@ public class App extends Application {
         while(true) {
             String string;
             if ((string = clientSideConnection.receiveMessage()) != null) {
-                numPlayers = Integer.parseInt(string.substring(28, 29));
-                playerID = Integer.parseInt(string.substring(40, 41));
+                numPlayers = Integer.parseInt(string.split(" ")[3]);
+                playerID = Integer.parseInt(string.split(" ")[6]);
                 System.out.println(string);
                 gameState = 1;
                 break;
@@ -66,8 +64,8 @@ public class App extends Application {
                         System.out.println(string);
                         int playerToMove;
                         double attack;
-                        playerToMove = Integer.parseInt(string.substring(14, 15));
-                        attack = Double.parseDouble(string.substring(16));
+                        playerToMove = Integer.parseInt(string.split(" ")[2]);
+                        attack = Double.parseDouble(string.split(" ")[3]);
                         System.out.println("Player #" + playerToMove + " hit " + attack + " attack value.");
                         players[playerToMove - 1].setCurrentX(players[playerToMove - 1].getX() + (attack) * CAR_SPEED);
                         }
@@ -96,7 +94,7 @@ public class App extends Application {
         // Draw players
         players = new Car[numPlayers];
         for(int i = 0; i < numPlayers; i++) {
-            players[i] = new Car(new Image("/car" + (i + 1) + ".png"), CAR_SPEED, carXPosition, carYPosition + i * CAR_DIST, carWidth, carHeight);
+            players[i] = new Car(new Image("/car" + ((i % 3) + 1) + ".png"), CAR_SPEED, carXPosition, carYPosition + i * CAR_DIST, carWidth, carHeight);
             paneGameRunning.getChildren().addAll(players[i]);
         }
 

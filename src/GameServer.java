@@ -75,7 +75,7 @@ public class GameServer {
 
                 String string;
 
-                sendMessage("NumJogadores: " + numPlayers + " Jogador: #" + playerID);
+                sendMessage("NumJogadores: " + numPlayers + " Jogador: # " + playerID);
 
                 while(true){
                     if((string = receiveMessage()) != null) {
@@ -84,8 +84,8 @@ public class GameServer {
                         double attack;
                         int playerToMove;
                         if(gameState == 1){
-                            playerToMove = Integer.parseInt(string.substring(15, 16));
-                            attack = Double.parseDouble(string.substring(17));
+                            playerToMove = Integer.parseInt(string.split(" ")[3]);
+                            attack = Double.parseDouble(string.split(" ")[4]);
                             for(int i = 0; i < numPlayers; i++) {
                                 players[i].sendMessage(playerToMove + " " + attack);
                             }

@@ -36,28 +36,14 @@ public class App extends Application {
 
     private int gameState = 0;
 
-    @Override
-    public void start(Stage primaryStage) {
+    private Thread listener;
 
-        primaryStage.setTitle("Undertale Fight");
+    public void connectToServer() {
 
         this.clientSideConnection = new ClientSideConnection();
-
-        while(true) {
-            String string;
-            if ((string = clientSideConnection.receiveMessage()) != null) {
-                numPlayers = Integer.parseInt(string.split(" ")[3]);
-                playerID = Integer.parseInt(string.split(" ")[6]);
-                System.out.println(string);
-                gameState = 1;
-                break;
-            }
-        }
-
-        Thread t = new Thread(new Runnable() {
+        this.listener = new Thread(new Runnable() {
             @Override
             public void run() {
-
                     while(true){
                         String string;
                         if((string = clientSideConnection.receiveMessage())!=null) {
@@ -73,7 +59,29 @@ public class App extends Application {
                 
             }
         });
-        t.start();
+
+        // esperando cliente conectar no servidor
+        while(true) {
+            String string;
+            if ((string = clientSideConnection.receiveMessage()) != null) {
+                numPlayers = Integer.parseInt(string.split(" ")[3]);
+                playerID = Integer.parseInt(string.split(" ")[6]);
+                System.out.println(string);
+                gameState = 1;
+                break;
+            }
+        }
+
+        // iniciando listener para receber mensagens do servidor
+        listener.start();
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+
+        primaryStage.setTitle("Undertale Fight");
+
+        connectToServer();
 
         // Creating gameRunning scene
         paneGameRunning = new Pane();

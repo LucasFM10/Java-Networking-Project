@@ -2,17 +2,21 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class App extends Application {
 
-    private Scene gameRunning;
-    private Pane paneGameRunning;
+    private Scene gameMenu, gameRunning, gameEnd;
+    private Pane paneGameRunning, paneGameMenu, paneGameEnd;
 
     private static final int panelWidth = 300;
     private static final int panelHeight = 200;
@@ -80,6 +84,30 @@ public class App extends Application {
     public void start(Stage primaryStage) {
 
         primaryStage.setTitle("Undertale Fight");
+        
+        // Creating gameRunning scene
+        paneGameRunning = new Pane();
+        gameRunning = new Scene(paneGameRunning, panelWidth, panelHeight);
+
+        // Create the menu scene
+        paneGameMenu = new Pane();
+        gameMenu = new Scene(paneGameMenu, 100, 100);
+        Button startButton = new Button("Start Game");
+        startButton.setOnAction(e -> primaryStage.setScene(gameRunning));
+        startButton.setMinWidth(100);
+        paneGameMenu.getChildren().addAll(startButton);
+
+        // Create the end scene
+        Button endButton = new Button("Menu");
+        paneGameEnd = new Pane();
+        gameEnd = new Scene(paneGameEnd, 100, 100);
+        endButton.setOnAction(e -> {
+            primaryStage.setScene(gameMenu);
+            for(int i = 0; i < numPlayers; i++) {
+                players[i].setX(0);
+            }
+        });
+        paneGameEnd.getChildren().addAll(endButton);
 
         connectToServer();
 
@@ -106,11 +134,15 @@ public class App extends Application {
             paneGameRunning.getChildren().addAll(players[i]);
         }
 
+        Stop[] stops = new Stop[] { new Stop(0, Color.RED), new Stop(0.75, Color.YELLOW), new Stop(1, Color.GREEN)};
+        LinearGradient lg1 = new LinearGradient(0, 0, 0.5, 0, true, CycleMethod.REFLECT, stops);
+
         // Draw the box
         Box box = new Box(boxInitPosX, boxInitPosY, BOX_WIDTH, BOX_HEIGHT, SLIDER_SPEED);
         box.setFill(Color.TRANSPARENT);
         box.setStroke(Color.BLACK);
         box.getSlider().setStroke(Color.BLACK);
+        box.setFill(lg1);
         paneGameRunning.getChildren().addAll(box, box.getSlider());
 
         gameRunning.setOnKeyPressed(new EventHandler<KeyEvent>() {

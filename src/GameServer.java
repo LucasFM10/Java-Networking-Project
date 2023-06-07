@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.util.Scanner;
 
 public class GameServer {
     
@@ -9,14 +8,14 @@ public class GameServer {
     private int gameState = 0;
     private ServerSideConnection[] players;
 
-    public GameServer(int numPlayers) {
+    public GameServer(int numPlayers, int porta) {
 
         System.out.println("----Game Server ----");
         this.numPlayers = numPlayers;
         players = new ServerSideConnection[numPlayers];
 
         try {
-            serverSocket = new ServerSocket(51734);
+            serverSocket = new ServerSocket(porta);
         } catch(IOException ex) {
             System.out.println("IOException from GameServer Constructor");
         }
@@ -44,20 +43,19 @@ public class GameServer {
 
         private Socket socket;
         
-        private DataInputStream dataInputStream;
+        // private DataInputStream dataInputStream;
         private DataOutputStream dataOutputStream;
 
         private BufferedReader bufferedReader;
         private PrintStream printStream;
 
         private int playerID;
-        private int carsLocs[] = new int[numPlayers];
 
         public ServerSideConnection(Socket s, int id) {
             this.socket = s;
             this.playerID = id;
             try {
-                dataInputStream = new DataInputStream(socket.getInputStream());
+                // dataInputStream = new DataInputStream(socket.getInputStream());
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
                 bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -70,6 +68,8 @@ public class GameServer {
         @Override
         public void run() {
             try {
+
+                System.out.println("Thread ativa: " + Thread.currentThread().getName());
                 dataOutputStream.writeInt(playerID);
                 dataOutputStream.flush();
 
@@ -118,24 +118,15 @@ public class GameServer {
             return string;
         }
 
-        public void closeConnection() {
-            try {
-                serverSocket.close();
-                socket.close();
-                System.out.println("Connection closed.");
-            } catch (IOException ex) {
-                System.out.println("IOException on closeConnect() in ServerSideConnection.");
-            }
-        }
+        // public void closeConnection() {
+        //     try {
+        //         serverSocket.close();
+        //         socket.close();
+        //         System.out.println("Connection closed.");
+        //     } catch (IOException ex) {
+        //         System.out.println("IOException on closeConnect() in ServerSideConnection.");
+        //     }
+        // }
         
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Escreva quantos players são!");
-        Scanner scan = new Scanner(System.in);
-        int nP = scan.nextInt();
-        scan.close();
-        GameServer gameServer = new GameServer(nP);
-        gameServer.acceptConnections();
     }
 }

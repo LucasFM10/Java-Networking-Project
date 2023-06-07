@@ -1,0 +1,183 @@
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+
+import java.io.IOException;
+import java.net.*;
+
+public class GUIMenu extends VBox {
+
+    App app;
+
+    public GUIMenu(App app) {
+
+        this.app = app;
+
+        // Título do jogo
+        Text titleText = new Text("Corrida dos Unicórnios");
+        titleText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+
+        // Botões
+        Button conectarButton = new Button("Conectar\nao Servidor");
+        conectarButton.setPrefSize(100, 100);
+        conectarButton.setWrapText(true);
+        conectarButton.setTextAlignment(TextAlignment.CENTER);
+        conectarButton.setOnAction(e -> exibirDialogoConectar());
+
+        Button criarServidorButton = new Button("Criar\nServidor");
+        criarServidorButton.setPrefSize(100, 100);
+        criarServidorButton.setWrapText(true);
+        criarServidorButton.setTextAlignment(TextAlignment.CENTER);
+        criarServidorButton.setOnAction(e -> exibirDialogoCriarServidor());
+
+        // Layout dos botões
+        HBox buttonBox = new HBox(20);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(conectarButton, criarServidorButton);
+
+        // Layout principal
+        this.setSpacing(20);
+        this.setPadding(new Insets(20));
+        this.setAlignment(Pos.CENTER);
+        this.getChildren().addAll(titleText, buttonBox);
+    }
+
+    private void exibirDialogoCriarServidor() {
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+
+        TextField portaTextField = new TextField();
+        portaTextField.setPrefWidth(100); // Definindo a largura preferencial do TextField
+
+        gridPane.add(new Text("Porta:"), 0, 0);
+        gridPane.add(portaTextField, 1, 0);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Criar Servidor");
+        alert.setHeaderText(null);
+        alert.getDialogPane().setContent(gridPane);
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                String porta = portaTextField.getText().trim();
+
+                if (validarPorta(porta)) {
+                    if (verificarPortaDisponivel(Integer.parseInt(porta))) {
+                        Thread t = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                app.createServer(Integer.parseInt(porta));
+                            }
+                        });
+                        t.start();
+                        System.out.println("Criar servidor na porta: " + porta);
+                    } else {
+                        exibirMensagemErro("A porta não está disponível para uso.");
+                    }
+                } else {
+                    exibirMensagemErro("Digite uma porta válida.");
+                    exibirDialogoCriarServidor(); // Chamada recursiva para exibir o diálogo novamente
+                }
+            }
+        });
+    }
+
+    private void exibirDialogoConectar() {
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+
+        TextField ipTextField = new TextField();
+        TextField portaTextField = new TextField();
+
+        gridPane.add(new Text("IP:"), 0, 0);
+        gridPane.add(ipTextField, 1, 0);
+        gridPane.add(new Text("Porta:"), 0, 1);
+        gridPane.add(portaTextField, 1, 1);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Conectar ao Servidor");
+        alert.setHeaderText(null);
+        alert.getDialogPane().setContent(gridPane);
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                String ip = ipTextField.getText().trim();
+                String porta = portaTextField.getText().trim();
+
+                if (validarIP(ip) && validarPorta(porta)) {
+
+
+
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            app.connectToServer(ip, Integer.parseInt(porta));
+                        }
+                    });
+                    t.start();
+
+                    
+                    System.out.println("Conectar ao servidor: IP=" + ip + ", Porta=" + porta);
+                } else {
+                    exibirMensagemErro("Digite um IP e uma porta válidos.");
+                    exibirDialogoConectar(); // Chamada recursiva para exibir o diálogo novamente
+                }
+            }
+        });
+    }
+
+    private boolean validarIP(String ip) {
+        // Utilize uma expressão regular para verificar se o IP é válido
+        String ipRegex = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+                + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+                + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+                + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+        return ip.matches(ipRegex);
+    }
+
+    private boolean validarPorta(String porta) {
+        // Verificar se a porta é um número válido
+        try {
+            int portaInt = Integer.parseInt(porta);
+            return portaInt >= 0 && portaInt <= 65535;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean verificarPortaDisponivel(int porta) {
+        try {
+            // Tenta criar um ServerSocket na porta especificada
+            ServerSocket serverSocket = new ServerSocket(porta);
+            serverSocket.close();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private void exibirMensagemErro(String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erro");
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
+
+}

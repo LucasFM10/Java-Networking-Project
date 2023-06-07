@@ -6,19 +6,19 @@ public class ClientSideConnection {
     private Socket socket;
     
     private DataInputStream dataInputStream;
-    private DataOutputStream dataOutputStream;
+    // private DataOutputStream dataOutputStream;
 
     private BufferedReader bufferedReader;
     private PrintStream printStream;
 
     private int playerID;
 
-    public ClientSideConnection () {
+    public ClientSideConnection (String ip, int porta) {
         System.out.println("---Client---");
         try {
-            socket = new Socket("localhost", 51734);
+            socket = new Socket(ip, porta);
             dataInputStream = new DataInputStream(socket.getInputStream());
-            dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            // dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printStream = new PrintStream(socket.getOutputStream());
@@ -28,27 +28,6 @@ public class ClientSideConnection {
         } catch(IOException ex) {
             System.out.println("IOException from ClientSideConnection constructor.");
         }
-    }
-
-    public void sendButtonNumber(int number) {
-        try {
-            dataOutputStream.writeInt(number);
-            dataOutputStream.flush();
-        } catch (Exception ex) {
-            System.out.println("IOException from sendButtonNumber() in ClientSideConnection.");
-        }
-    }
-
-    public int receiveButtonNumber() {
-
-        int number = -1;
-        try {
-            number = dataInputStream.readInt();
-            System.out.println("Player #outro clicked button #" + number + ".");
-        } catch (IOException ex) {
-            System.out.println("IOException from receiveButtonNumber() in ClientServerConection.");
-        }
-        return number;
     }
 
     public void closeConnection() {

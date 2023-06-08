@@ -1,18 +1,51 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameServer {
     
     private ServerSocket serverSocket;
-    private int numPlayers;
     private int gameState = 0;
-    private ServerSideConnection[] players;
+    private boolean waitingConnections = true;
+    private List<ServerSideConnection> players;
 
-    public GameServer(int numPlayers, int porta) {
+    public ServerSocket getServerSocket() {
+        return serverSocket;
+    }
+
+    public void setServerSocket(ServerSocket serverSocket) {
+        this.serverSocket = serverSocket;
+    }
+
+    public int getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(int gameState) {
+        this.gameState = gameState;
+    }
+
+    public boolean isWaitingConnections() {
+        return waitingConnections;
+    }
+
+    public void setWaitingConnections(boolean waitingConnections) {
+        this.waitingConnections = waitingConnections;
+    }
+
+    public List<ServerSideConnection> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<ServerSideConnection> players) {
+        this.players = players;
+    }
+
+    public GameServer(int porta) {
 
         System.out.println("----Game Server ----");
-        this.numPlayers = numPlayers;
-        players = new ServerSideConnection[numPlayers];
+        players = new ArrayList<>();
 
         try {
             serverSocket = new ServerSocket(porta);
@@ -24,19 +57,36 @@ public class GameServer {
     public void acceptConnections() {
         try {
             System.out.println("Waiting for connections...");
-            for(int i = 1; i <= numPlayers; i++) {
-                Socket socket = serverSocket.accept();
-                ServerSideConnection serverSideConnection = new ServerSideConnection(socket, i);
-                System.out.println("Player #" + (i) + " has connected.");
-                players[i - 1] = serverSideConnection;
-                Thread t = new Thread(serverSideConnection);
-                t.start();
+            int i = 0;
+            while(true) {
+                if(waitingConnections){
+                    serverSocket.setSoTimeout(5000);
+                    try {
+                        Socket socket = serverSocket.accept();
+                        i++;
+                        ServerSideConnection serverSideConnection = new ServerSideConnection(socket, i);
+                        System.out.println("Player #" + (i) + " has connected.");
+                        players.add(serverSideConnection);
+                        Thread t = new Thread(serverSideConnection);
+                        t.start();
+                    } catch (IOException e) {
+                        // Erro de aceitação do socket
+                        System.out.println("Erro de aceitação do socket: " + e.getMessage());
+                    }
+                } else {
+                    break;
+                }
             }
-            System.out.println("We now have " + this.numPlayers + " players. No longer accepting connections.");
+            System.out.println("We now have " + i + " players. No longer accepting connections.");
             gameState = 1;
         } catch (IOException ex) {
             System.out.println("IOException from acceptConnections()");
         }
+    }
+
+    public void endConnections() {
+        for(int i = 0; i < players.size(); i++) players.get(i).sendMessage("Conexões não são mais aceitas e  jogo está começando.");
+        this.waitingConnections = false;
     }
 
     private class ServerSideConnection implements Runnable {
@@ -75,8 +125,9 @@ public class GameServer {
 
                 String string;
 
-                sendMessage("NumJogadores: " + numPlayers + " Jogador: # " + playerID);
-
+                for(int i = 0; i < players.size(); i++) {
+                    players.get(i).sendMessage("NumJogadores: " + players.size() + " Jogador: # " + playerID + " conectado");
+                }
                 while(true){
                     if((string = receiveMessage()) != null) {
                         System.out.println(string);
@@ -86,8 +137,8 @@ public class GameServer {
                         if(gameState == 1){
                             playerToMove = Integer.parseInt(string.split(" ")[3]);
                             attack = Double.parseDouble(string.split(" ")[4]);
-                            for(int i = 0; i < numPlayers; i++) {
-                                players[i].sendMessage(playerToMove + " " + attack);
+                            for(int i = 0; i < players.size(); i++) {
+                                players.get(i).sendMessage(playerToMove + " " + attack);
                             }
                         }
                     }
@@ -128,5 +179,10 @@ public class GameServer {
         //     }
         // }
         
+    }
+    
+    public static void main(String[] args) {
+        GameServer gameServer = new GameServer(8888);
+        gameServer.acceptConnections();
     }
 }

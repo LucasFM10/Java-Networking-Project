@@ -16,6 +16,7 @@ public class ClientSideConnection {
     public ClientSideConnection (String ip, int porta) {
         System.out.println("---Client---");
         try {
+            System.out.println(ip + ":" + porta);
             socket = new Socket(ip, porta);
             dataInputStream = new DataInputStream(socket.getInputStream());
             // dataOutputStream = new DataOutputStream(socket.getOutputStream());

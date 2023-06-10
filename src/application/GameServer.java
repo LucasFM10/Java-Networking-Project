@@ -1,3 +1,5 @@
+package application;
+
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -85,8 +87,8 @@ public class GameServer {
     }
 
     public void endConnections() {
-        for(int i = 0; i < players.size(); i++) players.get(i).sendMessage("Conexões não são mais aceitas e  jogo está começando.");
         this.waitingConnections = false;
+        for(int i = 0; i < players.size(); i++) players.get(i).sendMessage("Conexões não são mais aceitas e  jogo está começando.");
     }
 
     private class ServerSideConnection implements Runnable {

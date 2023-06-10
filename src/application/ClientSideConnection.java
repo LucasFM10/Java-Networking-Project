@@ -1,3 +1,5 @@
+package application;
+
 import java.io.*;
 import java.net.*;
 
@@ -16,7 +18,7 @@ public class ClientSideConnection {
     public ClientSideConnection (String ip, int porta) {
         System.out.println("---Client---");
         try {
-            System.out.println(ip + ":" + porta);
+            // System.out.println(ip + ":" + porta);
             socket = new Socket(ip, porta);
             dataInputStream = new DataInputStream(socket.getInputStream());
             // dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -24,7 +26,7 @@ public class ClientSideConnection {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printStream = new PrintStream(socket.getOutputStream());
             playerID = dataInputStream.readInt();
-            System.out.println("Connected to server as Player #" + playerID + ".");
+            // System.out.println("Connected to server as Player #" + playerID + ".");
             // this.sendMessage("Olá, servidor!");
         } catch(IOException ex) {
             System.out.println("IOException from ClientSideConnection constructor.");
@@ -55,8 +57,9 @@ public class ClientSideConnection {
         String string = "-1";
         try {
             string = bufferedReader.readLine();
+            //System.out.println(string);
         } catch (IOException ex) {
-            System.out.println("IOException from receiveButtonNumber() in ClientServerConection.");
+            System.out.println("IOException from receiveMessage() in ClientServerConection.");
         }
         return string;
     }

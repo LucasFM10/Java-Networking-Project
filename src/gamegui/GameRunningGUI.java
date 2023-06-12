@@ -27,7 +27,7 @@ public class GameRunningGUI {
         Pane gameRunningScreen = new Pane();
 
          // Creating gameRunning scene
-        Scene gameRunning = new Scene(gameRunningScreen, App.getPanelwidth(), App.getPanelheight());
+        Scene gameRunning = new Scene(gameRunningScreen, App.panelWidth, App.panelHeight);
 
         // Draw start line
         Rectangle startLine = new Rectangle(App.carXPosition, App.panelHeight - App.carYPosition + 20, 10, App.BOX_HEIGHT);

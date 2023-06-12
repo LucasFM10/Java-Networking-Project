@@ -1,4 +1,5 @@
 package controllers;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -14,13 +15,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-public class MenuSceneController {
-
-    App app;
-
-    public void setApp(App app) {
-        this.app = app;
-    }
+public class MenuSceneController extends Controller {
 
     @FXML
     private Text titleText;
@@ -141,7 +136,6 @@ public class MenuSceneController {
     }
 
     @FXML
-
     protected boolean verificarPortaDisponivel(int porta) {
         try {
             // Tenta criar um ServerSocket na porta especificada

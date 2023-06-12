@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="gamegui.ServerScreenController"
+      spacing="10" alignment="CENTER" fillWidth="true" stylesheets="@application.css">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20" />
+    </padding>
+    
+    <Label fx:id="statusLabel" />
+    <Label fx:id="playersLabel" />
+    <Label fx:id="playerIDLabel" />
+    <Button text="Iniciar Jogo" onAction="#startGame" />
+</VBox>

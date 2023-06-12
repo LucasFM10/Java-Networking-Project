@@ -337,7 +337,7 @@ public class App extends Application {
 
         
 
-        App.this.setScene("/MenuScene.fxml");
+        App.this.setScene("/scenes/MenuScene.fxml");
         this.stage.show();
         
 

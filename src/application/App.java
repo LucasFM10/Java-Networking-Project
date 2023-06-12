@@ -1,12 +1,17 @@
 package application;
 
+
 import gamegui.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import controllers.MenuSceneController;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -29,8 +34,6 @@ public class App extends Application {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
-    private Label statusLabel;
 
     public Label getStatusLabel() {
         return statusLabel;
@@ -252,7 +255,15 @@ public class App extends Application {
         this.playersLabel = new Label(textLabel);
     }
 
-    private Label playersLabel;
+    private Label playersLabel, statusLabel, playerIDLabel;
+
+    public Label getPlayerIDLabel() {
+        return playerIDLabel;
+    }
+
+    public void setPlayerIDLabel(String string) {
+        this.playerIDLabel = new Label(string);
+    }
 
     public static final int panelWidth = 300;
     public static final int panelHeight = 200;
@@ -322,18 +333,42 @@ public class App extends Application {
         this.stage = primaryStage;
 
         this.gameState = 0;
-        this.menuGUI.showMenu();
+        // this.menuGUI.showMenu();
 
+        
+
+        App.this.setScene("/MenuScene.fxml");
         this.stage.show();
+        
+
     }
 
+    public void setScene(String sceneName) {
+        try {
+            Parent root;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(sceneName));
+            root = fxmlLoader.load();
+
+            MenuSceneController controller = fxmlLoader.getController();
+            controller.setApp(this);
+
+            Scene scene = new Scene(root);
+
+            this.getStage().setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    
     private void updatePreGameLabels() {
 
-        String statusText = isServer ? "Sou um servidor e estou "
-                + (this.gameServer.isWaitingConnections() ? "esperando mais players" : "esperando host iniciar o jogo")
+        String statusText = isServer ? ""
+                + (this.gameServer.isWaitingConnections() ? "Esperando mais players" : "Esperando host iniciar o jogo")
                 : "Esperando host iniciar o jogo";
-        this.statusLabel.setText("Status do Servidor: " + statusText);
+        this.statusLabel.setText("Status: " + statusText);
         this.playersLabel.setText("Número de Jogadores: " + this.players.size());
+        this.playerIDLabel.setText("Player: #" + this.playerID);
     }
 
     private class listenerLobbyRunner implements Runnable {

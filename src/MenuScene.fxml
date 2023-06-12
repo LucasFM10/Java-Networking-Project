@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.FontWeight?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.Region?>
+
+<VBox alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MenuSceneController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20" />
+    </padding>
+    <children>
+        <Text text="Corrida dos Unicórnios" fx:id="titleText">
+            <font>
+                <Font name="Arial Bold" size="24.0" />
+            </font>
+        </Text>
+        <HBox alignment="CENTER" spacing="20">
+            <children>
+                <Button text="Conectar ao Servidor" prefWidth="100" prefHeight="100" 
+                        wrapText="true" textAlignment="CENTER" onAction="#exibirDialogoConectar" />
+                <Button text="Criar Servidor" prefWidth="100" prefHeight="100"
+                        wrapText="true" textAlignment="CENTER" onAction="#exibirDialogoCriarServidor" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

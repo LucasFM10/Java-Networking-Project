@@ -337,13 +337,13 @@ public class App extends Application {
 
         
 
-        App.this.setScene("/scenes/MenuScene.fxml");
+        App.this.setSceneFXML("/scenes/MenuScene.fxml");
         this.stage.show();
         
 
     }
 
-    public void setScene(String sceneName) {
+    public void setSceneFXML(String sceneName) {
         try {
             Parent root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(sceneName));

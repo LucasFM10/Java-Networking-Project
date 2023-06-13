@@ -65,11 +65,11 @@ public class GameRunningGUI {
         Scene gameRunning = new Scene(gameRunningScreen, App.panelWidth, App.panelHeight);
 
         int squareSize = 5; // Define the size of your checker pattern squares
-        int numberOfSquares = App.carHeight * this.app.getPlayers().size();
+        int numberOfSquares = App.carHeight * this.app.getPlayers().size() / squareSize;
 
         // Draw start line
         for (int i = 0; i < numberOfSquares; i++) {
-            Rectangle square = new Rectangle(App.carXPosition, App.panelHeight - App.carYPosition + (i * squareSize), 10, squareSize);
+            Rectangle square = new Rectangle(App.carXPosition + App.carWidth, App.carYPosition + (i * squareSize), 10, squareSize);
             square.setFill(i % 2 == 0 ? Color.BLACK : Color.WHITE);
             square.setStroke(Color.BLACK); // Add border to the square
             gameRunningScreen.getChildren().add(square);
@@ -77,7 +77,7 @@ public class GameRunningGUI {
 
         // Draw finish line
         for (int i = 0; i < numberOfSquares; i++) {
-            Rectangle square = new Rectangle(App.panelWidth - App.carXPosition - 10, App.panelHeight - App.carYPosition + (i * squareSize), 10, squareSize);
+            Rectangle square = new Rectangle(App.panelWidth - App.carXPosition - App.carWidth - squareSize, App.carYPosition + (i * squareSize), 10, squareSize);
             square.setFill(i % 2 == 0 ? Color.BLACK : Color.WHITE);
             square.setStroke(Color.BLACK); // Add border to the square
             gameRunningScreen.getChildren().add(square);
@@ -93,7 +93,7 @@ public class GameRunningGUI {
         LinearGradient lg1 = new LinearGradient(0, 0, 0.5, 0, true, CycleMethod.REFLECT, stops);
 
         // Draw the box
-        Box box = new Box(App.boxInitPosX, App.boxInitPosY, App.BOX_WIDTH, App.BOX_HEIGHT, App.SLIDER_SPEED);
+        Box box = new Box(App.panelWidth / 2 - App.BOX_WIDTH / 2, App.boxInitPosY, App.BOX_WIDTH, App.BOX_HEIGHT, App.SLIDER_SPEED);
         box.setFill(Color.TRANSPARENT);
         box.setStroke(Color.BLACK);
         box.getSlider().setStroke(Color.BLACK);
@@ -155,7 +155,14 @@ public class GameRunningGUI {
             }
             });
         });
+        Platform.runLater(new Runnable() {
 
-        countdownTimeline.play();
+            @Override
+            public void run() {
+                GameRunningGUI.this.app.getStage().setScene(gameRunning);
+            }
+            });
+
+        //            countdownTimeline.play();
     }
 }

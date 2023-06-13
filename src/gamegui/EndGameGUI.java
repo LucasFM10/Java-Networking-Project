@@ -2,6 +2,7 @@ package gamegui;
 
 import application.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,7 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class EndGameGUI extends Application {
+public class EndGameGUI {
 
     App app;
 
@@ -22,12 +23,8 @@ public class EndGameGUI extends Application {
     public EndGameGUI(App app){
         this.app = app;
     }
-    public static void main(String[] args) {
-        launch(args);
-    }
 
-    @Override
-    public void start(Stage primaryStage) {
+    public void show() {
         firstPlaceLabel = new Label("1st Place: -");
         secondPlaceLabel = new Label("2nd Place: -");
         thirdPlaceLabel = new Label("3rd Place: -");
@@ -40,15 +37,31 @@ public class EndGameGUI extends Application {
         Button backButton = new Button("Voltar ao Menu");
         backButton.setOnAction(event -> {
             // Lógica para voltar ao menu aqui
-            System.out.println("Voltando ao menu...");
+
+                EndGameGUI.this.app.menuGUI.showMenu();
+            
         });
+
+            System.out.println("Voltando ao menu...");
+        
 
         root.getChildren().add(backButton);
 
-        Scene scene = new Scene(root, 200, 300);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("End Game");
-        primaryStage.show();
+        //primaryStage.setScene(scene);
+        //primaryStage.setTitle("End Game");
+        //primaryStage.show();
+
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                EndGameGUI.this.app.getStage().setScene(new Scene(root, 400, 300));
+                //GameServer.getServerSocket().close;
+            }
+        });
+
+
+        //this.app.getStage().setScene(new Scene(root, 400, 300));
     }
 
     public void setFirstPlace(String playerName) {

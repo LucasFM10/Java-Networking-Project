@@ -1,15 +1,19 @@
 package gamegui;
 
+import java.util.Optional;
+
 import application.App;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
 public class LobbyGUI {
+
     App app;
 
     public LobbyGUI(App app) {
@@ -17,6 +21,12 @@ public class LobbyGUI {
     }
 
     public void showServerScreen() {
+        String nicknameString = promptForNickname();
+        if (nicknameString != null) {
+            System.out.println(nicknameString);
+            this.app.nickName = nicknameString;
+            System.out.println(this.app.nickName);
+        }
         // Reset the status and player labels
         this.app.setStatusLabel("");
         this.app.setPlayersLabel("");
@@ -56,6 +66,12 @@ public class LobbyGUI {
     }
 
     public void showClientScreen() {
+        String nicknameString = promptForNickname();
+        if (nicknameString != null) {
+            System.out.println(nicknameString);
+            this.app.nickName = nicknameString;
+            System.out.println(this.app.nickName);
+        }
         this.app.setStatusLabel("");
         this.app.setPlayersLabel("");
         this.app.setPlayerIDLabel("");
@@ -71,5 +87,23 @@ public class LobbyGUI {
                 LobbyGUI.this.app.getStage().setScene(new Scene(clientLobbyScreen, 400, 300));
             }
         });
+    }
+
+    private String promptForNickname() {
+        
+        final String[] nickname = new String[1];
+        Platform.runLater(() -> {
+            TextInputDialog nicknameDialog = new TextInputDialog("");
+            nicknameDialog.setTitle("Insira um apelido");
+            nicknameDialog.setHeaderText(null);
+            nicknameDialog.setContentText("Por favor, insira seu apelido:");
+
+            Optional<String> result = nicknameDialog.showAndWait();
+            if (result.isPresent()) {
+                nickname[0] = result.get();
+            }
+        });
+
+        return nickname[0];
     }
 }

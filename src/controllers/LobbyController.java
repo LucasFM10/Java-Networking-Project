@@ -25,9 +25,6 @@ public class LobbyController {
 
     @FXML
     public void initialize() {
-        while (true) {
-            
-        }
     }
 
     @FXML

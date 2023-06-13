@@ -33,10 +33,14 @@ public class App extends Application {
     public static final int carWidth = 20;
     public static final int carHeight = 30;
 
-    private MenuGUI menuGUI = new MenuGUI(this);
+    public MenuGUI menuGUI = new MenuGUI(this);
     private LobbyGUI preGameGUI = new LobbyGUI(this);
     private GameRunningGUI gameRunningGUI = new GameRunningGUI(this);
     private EndGameGUI endGameGUI = new EndGameGUI(this);
+
+    private List<Car> players;
+    private int playerID;
+    public String nickName;
 
     private Stage stage;
     private Label statusLabel = new Label("");
@@ -66,12 +70,11 @@ public class App extends Application {
         
         App.this.setPlayers(new ArrayList<>());
 
-        // if(isServer) {
-        //     App.this.preGameGUI.showServerScreen();
-        // } else {
-        //     App.this.preGameGUI.showClientScreen();
-        // }
-        this.setSceneFXML("Lobby");
+        if(isServer) {
+            App.this.preGameGUI.showServerScreen();
+        } else {
+            App.this.preGameGUI.showClientScreen();
+        }
         this.gameState = 1;
         this.clientSideConnection = new ClientSideConnection(ip, porta);
         this.listenerLobby = new Thread(new listenerLobby());
@@ -94,11 +97,7 @@ public class App extends Application {
         this.stage = primaryStage;
 
         this.gameState = 0;
-        //this.menuGUI.showMenu();
-
-        
-
-        App.this.setSceneFXML("Menu");
+        this.menuGUI.showMenu();
         
         this.stage.show();
         
@@ -138,6 +137,8 @@ public class App extends Application {
     }
 
     private void updateLobbyLabels() {
+
+        
 
         String statusText = isServer ? ("Esperando mais players") : "Esperando host iniciar o jogo";
         this.statusLabel.setText("Status: " + statusText);
@@ -208,7 +209,14 @@ public class App extends Application {
                         //verifica se o jogador chegou na linha de chegada e encerra o jogo
                         if ((players.get(playerToMove - 1).currentX) >= 250 ){
                             //setSceneFXML("EndGame");
-                            //this.app.endGameGUI.show();
+                            App.this.endGameGUI.show();
+                            App.this.endGameGUI.setFirstPlace(playerToMove + "");
+                            //try {
+								//gameServer.getServerSocket().close();
+							//} catch (IOException e) {
+								// TODO Auto-generated catch block
+								//e.printStackTrace();
+							//}
                         }
                         
                     } else {
@@ -255,9 +263,6 @@ public class App extends Application {
     public void setServidorIPLabel(String text) {
         this.playerIDLabel = new Label(text);
     }
-
-    private List<Car> players;
-    private int playerID;
 
     public Stage getStage() {
         return stage;

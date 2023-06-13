@@ -33,5 +33,4 @@ public class LobbyController {
         System.out.println("Jogo iniciado");
     }
 
-    // Adicione aqui os métodos necessários para atualizar os labels
 }

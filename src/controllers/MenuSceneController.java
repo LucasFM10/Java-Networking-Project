@@ -15,7 +15,13 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-public class MenuSceneController extends Controller {
+public class MenuSceneController {
+
+    App app;
+
+    public void setApp(App app) {
+        this.app = app;
+    }
 
     @FXML
     private Text titleText;
@@ -32,6 +38,7 @@ public class MenuSceneController extends Controller {
         gridPane.setPadding(new Insets(20));
 
         TextField portaTextField = new TextField();
+        portaTextField.setText("8888");
         portaTextField.setPrefWidth(100); // Definindo a largura preferencial do TextField
 
         gridPane.add(new Text("Porta:"), 0, 0);
@@ -87,7 +94,9 @@ public class MenuSceneController extends Controller {
         gridPane.setPadding(new Insets(20));
 
         TextField ipTextField = new TextField();
+        ipTextField.setText("192.168.0.23");
         TextField portaTextField = new TextField();
+        portaTextField.setText("8888");
 
         gridPane.add(new Text("IP:"), 0, 0);
         gridPane.add(ipTextField, 1, 0);

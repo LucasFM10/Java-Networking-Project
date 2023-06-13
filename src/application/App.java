@@ -33,11 +33,13 @@ public class App extends Application {
     public static final int carWidth = 20;
     public static final int carHeight = 30;
 
-    private MenuGUI menuGUI = new MenuGUI(this);
+    // private MenuGUI menuGUI = new MenuGUI(this);
     private PreGameGUI preGameGUI = new PreGameGUI(this);
     private GameRunningGUI gameRunningGUI = new GameRunningGUI(this);
     private Stage stage;
-    private Label statusLabel, playersLabel, playerIDLabel;private GameServer gameServer;
+    private Label statusLabel, playersLabel, playerIDLabel, servidorIPLabel;
+
+    private GameServer gameServer;
     private ClientSideConnection clientSideConnection;
     private int gameState = 0;
 
@@ -59,11 +61,8 @@ public class App extends Application {
         
         App.this.setPlayers(new ArrayList<>());
 
-        if(isServer) {
-            this.preGameGUI.showServerScreen();
-        } else {
-            this.preGameGUI.showClientScreen();
-        }
+        App.this.setSceneFXML("Lobby");
+        
         this.gameState = 1;
         this.clientSideConnection = new ClientSideConnection(ip, porta);
         this.listenerLobby = new Thread(new listenerLobby());
@@ -104,16 +103,26 @@ public class App extends Application {
 
             switch(sceneName) {
                 case "MenuScene":
-                    MenuSceneController controller = fxmlLoader.getController();
-                    controller.setApp(this);
+                    MenuSceneController menuController = fxmlLoader.getController();
+                    menuController.setApp(this);
                     break;
                 case "LobbyScene":
+                    LobbyController lobbyController = fxmlLoader.getController();
+                    lobbyController.setApp(this);
+                    break;
+                case "EndGameScene":
+                    EndGameController controllerEndGameGUI = fxmlLoader.getController();
+                    controllerEndGameGUI.setApp(this);
                     break;
             }
 
             Scene scene = new Scene(root);
+            
+            Platform.runLater(() -> {
+                this.getStage().setScene(scene);
+            });
 
-            this.getStage().setScene(scene);
+            //this.getStage().setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,9 +131,7 @@ public class App extends Application {
     
     private void updatePreGameLabels() {
 
-        String statusText = isServer ? ""
-                + (this.gameServer.isWaitingConnections() ? "Esperando mais players" : "Esperando host iniciar o jogo")
-                : "Esperando host iniciar o jogo";
+        String statusText = isServer ? ("Esperando mais players") : "Esperando host iniciar o jogo";
         this.statusLabel.setText("Status: " + statusText);
         this.playersLabel.setText("Número de Jogadores: " + this.players.size());
         this.playerIDLabel.setText("Player: #" + this.playerID);
@@ -189,12 +196,16 @@ public class App extends Application {
                         playerToMove = Integer.parseInt(string.split(" ")[2]);
                         attack = Double.parseDouble(string.split(" ")[3]);
                         System.out.println("Player #" + playerToMove + " hit " + attack + " attack value.");
-                        players.get(playerToMove - 1).setCurrentX(players.get(playerToMove - 1).getX() + (attack) * CAR_SPEED);
+                        players.get(playerToMove - 1).setCurrentX(Math.min(250 ,players.get(playerToMove - 1).getX() + (attack) * CAR_SPEED));
+                        //verifica se o jogador chegou na linha de chegada e encerra o jogo
+                        if ((players.get(playerToMove - 1).currentX) >= 250 ){
+                            setSceneFXML("EndGameScene");
+                        }
+                        
                     } else {
                         break;
                     }
                 }
-                
             }
         }
         
@@ -225,6 +236,14 @@ public class App extends Application {
     }
 
     public void setPlayerIDLabel(String text) {
+        this.playerIDLabel = new Label(text);
+    }
+
+    public Label getServidorIPLabel() {
+        return playerIDLabel;
+    }
+
+    public void setServidorIPLabel(String text) {
         this.playerIDLabel = new Label(text);
     }
 
@@ -302,6 +321,5 @@ public class App extends Application {
     public void setListenerUpdateGame(Thread listenerUpdateGame) {
         this.listenerUpdateGame = listenerUpdateGame;
     }
-
     
 }

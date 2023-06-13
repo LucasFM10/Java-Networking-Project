@@ -8,7 +8,7 @@ import java.util.List;
 public class GameServer {
     
     private ServerSocket serverSocket;
-    private int gameState = 0;
+    private int serverState = 0;
     private boolean waitingConnections = true;
     private List<ServerSideConnection> players;
 
@@ -20,12 +20,12 @@ public class GameServer {
         this.serverSocket = serverSocket;
     }
 
-    public int getGameState() {
-        return gameState;
+    public int getServerState() {
+        return serverState;
     }
 
-    public void setGameState(int gameState) {
-        this.gameState = gameState;
+    public void setServerState(int gameState) {
+        this.serverState = gameState;
     }
 
     public boolean isWaitingConnections() {
@@ -80,7 +80,7 @@ public class GameServer {
                 }
             }
             System.out.println("We now have " + i + " players. No longer accepting connections.");
-            gameState = 1;
+            serverState = 1;
         } catch (IOException ex) {
             System.out.println("IOException from acceptConnections()");
         }
@@ -88,7 +88,8 @@ public class GameServer {
 
     public void endConnections() {
         this.waitingConnections = false;
-        for(int i = 0; i < players.size(); i++) players.get(i).sendMessage("Conexões não são mais aceitas e  jogo está começando.");
+        for(int i = 0; i < players.size(); i++) 
+            players.get(i).sendMessage("Conexões não são mais aceitas e  jogo está começando.");
     }
 
     private class ServerSideConnection implements Runnable {
@@ -96,7 +97,6 @@ public class GameServer {
         private Socket socket;
         
         // private DataInputStream dataInputStream;
-        private DataOutputStream dataOutputStream;
 
         private BufferedReader bufferedReader;
         private PrintStream printStream;
@@ -107,8 +107,6 @@ public class GameServer {
             this.socket = s;
             this.playerID = id;
             try {
-                // dataInputStream = new DataInputStream(socket.getInputStream());
-                dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
                 bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 printStream = new PrintStream(socket.getOutputStream());
@@ -122,8 +120,6 @@ public class GameServer {
             try {
 
                 System.out.println("Thread ativa: " + Thread.currentThread().getName());
-                dataOutputStream.writeInt(playerID);
-                dataOutputStream.flush();
 
                 String string;
 
@@ -136,7 +132,7 @@ public class GameServer {
                         // sendMessage("Recebi sua mensagem, jogador #" + string.charAt(8) + "!");
                         double attack;
                         int playerToMove;
-                        if(gameState == 1){
+                        if(serverState == 1){
                             playerToMove = Integer.parseInt(string.split(" ")[3]);
                             attack = Double.parseDouble(string.split(" ")[4]);
                             for(int i = 0; i < players.size(); i++) {
@@ -145,7 +141,7 @@ public class GameServer {
                         }
                     }
                 }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 System.out.println("IOException from run() ServerSideConnection: " + ex);
             }
         }
@@ -181,10 +177,5 @@ public class GameServer {
         //     }
         // }
         
-    }
-    
-    public static void main(String[] args) {
-        GameServer gameServer = new GameServer(8888);
-        gameServer.acceptConnections();
     }
 }

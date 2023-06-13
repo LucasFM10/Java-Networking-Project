@@ -21,6 +21,7 @@ public class PreGameGUI {
         this.app.setStatusLabel("");
         this.app.setPlayersLabel("");
         this.app.setPlayerIDLabel("");
+        this.app.setServidorIPLabel("");
 
         // Create a new VBox with 10px spacing
         VBox serverLobbyScreen = new VBox(10);

@@ -75,7 +75,7 @@ public class GameRunningGUI {
             gameRunningScreen.getChildren().add(square);
         }
 
-        // Draw finish line
+        // Desenha as linhas de chegada e partida
         for (int i = 0; i < numberOfSquares; i++) {
             Rectangle square = new Rectangle(App.panelWidth - App.carXPosition - App.carWidth - squareSize, App.carYPosition + (i * squareSize), 10, squareSize);
             square.setFill(i % 2 == 0 ? Color.BLACK : Color.WHITE);
@@ -86,7 +86,7 @@ public class GameRunningGUI {
 
         Label nameLabels[] = new Label[this.app.getPlayers().size()];
 
-        // Draw players
+        // Desenha os players
         for(int i = 0; i < GameRunningGUI.this.app.getPlayers().size(); i++) {
             GameRunningGUI.this.app.getPlayers().set(i, new Car(new Image("/assets/car" + ((i % 3) + 1) + ".png"), App.CAR_SPEED, App.carXPosition, App.carYPosition + i * App.CAR_DIST, App.carWidth, App.carHeight, this.app.getPlayers().get(i).nickName));
 
@@ -100,7 +100,7 @@ public class GameRunningGUI {
         Stop[] stops = new Stop[] { new Stop(0, Color.RED), new Stop(0.75, Color.YELLOW), new Stop(1, Color.GREEN)};
         LinearGradient lg1 = new LinearGradient(0, 0, 0.5, 0, true, CycleMethod.REFLECT, stops);
 
-        // Draw the box
+        // Desenha a box
         Box box = new Box(App.panelWidth / 2 - App.BOX_WIDTH / 4, App.boxInitPosY, App.BOX_WIDTH / 2, App.BOX_HEIGHT, App.SLIDER_SPEED);
         box.setFill(Color.TRANSPARENT);
         box.setStroke(Color.BLACK);
@@ -111,9 +111,10 @@ public class GameRunningGUI {
         EventHandler<KeyEvent> eventHandler = new EventHandler<KeyEvent>() {
             public void handle(KeyEvent ke) {
                 if(ke.getText().equals("x") && GameRunningGUI.this.xPressed == false) {
-                    // print the attack value based on the position of the slider
+
+                    //printa o valor do ataque baseado na posicao do slider
                     double attackValue = Math.abs(((double) box.getSlider().getEndX() - App.boxInitPosX) - App.BOX_WIDTH / 2) / (App.BOX_WIDTH / 2);
-                    // System.out.println("Attack power: " + (1 - attackValue));
+
 
                     GameRunningGUI.this.app.getClientSideConnection().sendMessage(GameRunningGUI.this.app.getPlayerID() + " " + (0.5 - attackValue));
                     GameRunningGUI.this.xPressed = true;
@@ -123,7 +124,7 @@ public class GameRunningGUI {
 
         gameRunning.setOnKeyPressed(eventHandler);
 
-        // Animation to move the slider
+        // Animação para mover o slider de movimentacao
         AnimationTimer slider = new AnimationTimer() {
             private long lastUpdate = 0 ;
             @Override
@@ -164,14 +165,6 @@ public class GameRunningGUI {
             }
             });
         });
-        
-        // Platform.runLater(new Runnable() {
-
-        //     @Override
-        //     public void run() {
-        //         GameRunningGUI.this.app.getStage().setScene(gameRunning);
-        //     }
-        // });
 
         countdownTimeline.play();
     }

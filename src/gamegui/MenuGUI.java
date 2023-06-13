@@ -169,7 +169,6 @@ public class MenuGUI {
                     });
                     t.start();
 
-                    // System.out.println("Conectar ao servidor: IP=" + ip + ", Porta=" + porta);
                 } else {
                     exibirMensagemErro("Digite um IP e uma porta válidos.");
                     exibirDialogoConectar(e); // Chamada recursiva para exibir o diálogo novamente

@@ -89,8 +89,6 @@ public class App extends Application {
         // gameState = 1 -> jogo ainda não começou, estamos esperando os clientes
         // conectarem e o servidor decidir iniciar o jogo.
         // gameState = 2 -> jogo está rolando! que vença o melhor!
-        // gameState = 3 -> jogo terminou, esperando ação do servidor (reiniciar o jogo?
-        // encerrar servidor? retornar para menu inicial?)
 
         this.stage = primaryStage;
 
@@ -103,8 +101,6 @@ public class App extends Application {
     }
 
     private void updateLobbyLabels() {
-
-        
 
         String statusText = isServer ? ("está esperando por mais players\nno ip " + this.ip + " e na porta " + this.porta) : "está esperando o host iniciar o jogo";
         this.statusLabel.setText("Status: " + this.nickName + " " + statusText);
@@ -122,7 +118,6 @@ public class App extends Application {
                 String string;
                 if ((string = clientSideConnection.receiveMessage()) != null) {
 
-                    System.out.println(string);
 
                     if(string.split(" ")[3].equals("não")) {
 
@@ -137,7 +132,7 @@ public class App extends Application {
 
                     for (int i = players.size(); i < Integer.parseInt(string.split(" ")[3]); i++) {
                         players.add(i, new Car(string.split(" ")[7 + i]));
-                        System.out.println(string.split(" ")[7 + i]);
+                        
                         Platform.runLater(new Runnable() {
 
                             @Override
@@ -152,7 +147,7 @@ public class App extends Application {
             }
 
             App.this.gameRunningGUI.show();
-            // App.this.setSceneFXML("GameRunning");
+            
             App.this.listenerUpdateGame.start();
         }
     }
@@ -178,18 +173,12 @@ public class App extends Application {
                         System.out.println("Player #" + playerToMove + " hit " + attack + " attack value.");
                         players.get(playerToMove - 1).setCurrentX(Math.min(App.panelWidth - App.carXPosition - App.carWidth - 5
                             ,players.get(playerToMove - 1).getX() + (attack) * CAR_SPEED));
+
                         //verifica se o jogador chegou na linha de chegada e encerra o jogo
                         if ((players.get(playerToMove - 1).getCurrentX()) >= App.panelWidth - App.carXPosition - App.carWidth - 5 ){
-                            //setSceneFXML("EndGame");
+                            
                             App.this.endGameGUI.show();
                             App.this.endGameGUI.setFirstPlace(players.get(playerToMove - 1).nickName + "");
-                            
-                            //try {
-								//gameServer.getServerSocket().close();
-							//} catch (IOException e) {
-								// TODO Auto-generated catch block
-								//e.printStackTrace();
-							//}
                         }
                         
                     } else {

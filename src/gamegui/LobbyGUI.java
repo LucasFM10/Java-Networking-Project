@@ -1,22 +1,13 @@
 package gamegui;
 
-import java.util.Optional;
-
 import application.App;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class LobbyGUI {
@@ -37,28 +28,31 @@ public class LobbyGUI {
         this.app.setPlayerIDLabel("");
         this.app.setServidorIPLabel("");
 
-        // Create a new VBox with 10px spacing
+        // cria uma nova vbox
         VBox serverLobbyScreen = new VBox(10);
-        // Set padding of 20px on all sides
+
+        // define a padding
         serverLobbyScreen.setPadding(new Insets(20, 20, 20, 20));
-        // Center all items in the VBox
+
+        // Centraliza os itens na vbox
         serverLobbyScreen.setAlignment(Pos.CENTER);
 
-        // Add status and players labels to the VBox
+        // adiciona as labels de status e player id para a vbox
         serverLobbyScreen.getChildren().addAll(this.app.getStatusLabel(), this.app.getPlayersLabel(), this.app.getPlayerIDLabel());
 
-        // Create a start game button
+        // cria o botão de start
         Button btn = new Button("Iniciar Jogo");
-        // Set the font size to 16px
+
+        // define o tamanho da fonte
         btn.setFont(new Font(16));
 
-        // Add an action to the button
+        // adiciona a acao para o botao
         btn.setOnAction(e -> {
             System.out.println("Jogo iniciado");
             this.app.getGameServer().endConnections();
         });
 
-        // Add button to the VBox
+        // adiciona o botao da vbox
         serverLobbyScreen.getChildren().addAll(btn);
 
         Platform.runLater(new Runnable() {

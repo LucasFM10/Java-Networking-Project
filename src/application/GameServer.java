@@ -13,8 +13,6 @@ public class GameServer {
     private List<ServerSideConnection> players;
     public String s = "";
 
-    public ServerSideConnection esteServerSideConnection = null;
-
     public ServerSocket getServerSocket() {
         return serverSocket;
     }
@@ -75,7 +73,6 @@ public class GameServer {
                         System.out.println("Player #" + (i) + " has connected.");
                         players.add(serverSideConnection);
                         Thread t = new Thread(serverSideConnection);
-                        esteServerSideConnection = serverSideConnection;
                         t.start();
                     } catch (IOException e) {
                         // Erro de aceitação do socket
@@ -98,10 +95,12 @@ public class GameServer {
             players.get(i).sendMessage("Conexões não são mais aceitas e  jogo está começando.");
     }
 
-    public void closeConnection(ServerSideConnection serverSideConnection) {
+    public void closeConnection() {
             try {
+                for(int i = 0; i < players.size(); i++) {
+                    players.get(i).socket.close();
+                }
                 serverSocket.close();
-                serverSideConnection.closeConnection();
                 System.out.println("Connection closed.");
             } catch (IOException ex) {
                 System.out.println("IOException on closeConnect() in ServerSideConnection.");
@@ -111,8 +110,6 @@ public class GameServer {
     private class ServerSideConnection implements Runnable {
 
         private Socket socket;
-        
-        // private DataInputStream dataInputStream;
 
         private BufferedReader bufferedReader;
         private PrintStream printStream;
@@ -156,7 +153,6 @@ public class GameServer {
                             
                         } else {
 
-                            // sendMessage("Recebi sua mensagem, jogador #" + string.charAt(8) + "!");
                             double attack;
                             int playerToMove;
                             if(serverState == 1){
@@ -195,16 +191,6 @@ public class GameServer {
                 System.out.println("IOException from receiveMessage() in ServerSideConection." + ex);
             }
             return string;
-        }
-
-        public void closeConnection() {
-            try {
-
-                socket.close();
-                System.out.println("Connection closed.");
-            } catch (IOException ex) {
-                System.out.println("IOException on closeConnect() in ServerSideConnection.");
-            }
         }
         
     }

@@ -138,10 +138,6 @@ public class GameServer {
             try {
                 System.out.println("Thread ativa: " + Thread.currentThread().getName());
 
-                for(int i = 0; i < players.size(); i++) {
-                    players.get(i).sendMessage("NumJogadores: " + players.size() + " Jogador: # " + playerID + " " + s);
-                }
-
                 while(true){
                     String string2;
                     if((string2 = receiveMessage()) != null) {
@@ -153,6 +149,11 @@ public class GameServer {
                             s = s + players.get(players.size() - 1).nickName + " ";
 
                             System.out.println(s);
+
+                            for(int i = 0; i < players.size(); i++) {
+                                players.get(i).sendMessage("NumJogadores: " + players.size() + " Jogador: # " + playerID + " " + s);
+                            }
+                            
                         } else {
 
                             // sendMessage("Recebi sua mensagem, jogador #" + string.charAt(8) + "!");
@@ -168,6 +169,7 @@ public class GameServer {
 
                         }
                     }
+                
                 }
             } catch (Exception ex) {
                 System.out.println("IOException from run() ServerSideConnection: " + ex);
@@ -180,7 +182,7 @@ public class GameServer {
                 printStream.println(sd + string);
                 printStream.flush();
             } catch (Exception ex) {
-                System.out.println("IOException from sendButtonNumber() in ClientSideConnection.");
+                System.out.println("IOException from sendButtonNumber() in ServerSideConection.");
             }
         }
     
@@ -190,7 +192,7 @@ public class GameServer {
             try {
                 string = bufferedReader.readLine();
             } catch (IOException ex) {
-                System.out.println("IOException from receiveButtonNumber() in ClientServerConection.");
+                System.out.println("IOException from receiveButtonNumber() in ServerSideConection." + ex);
             }
             return string;
         }

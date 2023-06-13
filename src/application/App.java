@@ -76,6 +76,7 @@ public class App extends Application {
 
         this.gameState = 1;
         this.clientSideConnection = new ClientSideConnection(ip, porta);
+        this.clientSideConnection.sendMessage("nickname = " + nickName);
         this.listenerLobby = new Thread(new listenerLobby());
         this.listenerUpdateGame = new Thread(new listenerUpdateGame());
         listenerLobby.start();
@@ -134,13 +135,11 @@ public class App extends Application {
                     if (playerID == 0) {
                         App.this.playerID = Integer.parseInt(string.split(" ")[6]);
                         App.this.getClientSideConnection().playerID = App.this.playerID;
-
-                        App.this.clientSideConnection.sendMessage("nickname = " + nickName);
                     }
 
                     for (int i = players.size(); i < Integer.parseInt(string.split(" ")[3]); i++) {
-                        players.add(i, new Car(string.split(" ")[4 + i]));
-                        System.out.println(string.split(" ")[4 + i]);
+                        players.add(i, new Car(string.split(" ")[7 + i]));
+                        System.out.println(string.split(" ")[7 + i]);
                         Platform.runLater(new Runnable() {
 
                             @Override

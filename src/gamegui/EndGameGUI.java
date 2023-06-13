@@ -73,11 +73,16 @@ public class EndGameGUI {
                 this.app.getClientSideConnection().closeConnection();
             }
 
+            // App newApp = new App();
+
             //EndGameGUI.this.app.stage = appStage;
             EndGameGUI.this.app.menuGUI = new MenuGUI(EndGameGUI.this.app);
             EndGameGUI.this.app.preGameGUI = new LobbyGUI(EndGameGUI.this.app);
             EndGameGUI.this.app.gameRunningGUI = new GameRunningGUI(EndGameGUI.this.app);
             EndGameGUI.this.app.endGameGUI = new EndGameGUI(EndGameGUI.this.app);
+
+            EndGameGUI.this.app.isServer = false;
+            
             EndGameGUI.this.app.gameState = 0;
             EndGameGUI.this.app.menuGUI.showMenu();
             EndGameGUI.this.app.stage.show();

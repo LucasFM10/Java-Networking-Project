@@ -15,7 +15,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-public class MenuSceneController {
+public class MenuController {
 
     App app;
 
@@ -62,7 +62,7 @@ public class MenuSceneController {
                         Thread createServer = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                MenuSceneController.this.app.createServer(Integer.parseInt(porta));
+                                MenuController.this.app.createServer(Integer.parseInt(porta));
                             }
                         });
                         createServer.start();
@@ -70,7 +70,7 @@ public class MenuSceneController {
                         Thread connectServer = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                MenuSceneController.this.app.connectToServer("localhost", Integer.parseInt(porta));
+                                MenuController.this.app.connectToServer("localhost", Integer.parseInt(porta));
                             }
                         });
                         connectServer.start();
@@ -119,7 +119,7 @@ public class MenuSceneController {
                     Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            MenuSceneController.this.app.connectToServer(ip, Integer.parseInt(porta));
+                            MenuController.this.app.connectToServer(ip, Integer.parseInt(porta));
                         }
                     });
                     t.start();

@@ -33,11 +33,16 @@ public class App extends Application {
     public static final int carWidth = 20;
     public static final int carHeight = 30;
 
-    // private MenuGUI menuGUI = new MenuGUI(this);
-    private PreGameGUI preGameGUI = new PreGameGUI(this);
+    private MenuGUI menuGUI = new MenuGUI(this);
+    private LobbyGUI preGameGUI = new LobbyGUI(this);
     private GameRunningGUI gameRunningGUI = new GameRunningGUI(this);
+    private EndGameGUI endGameGUI = new EndGameGUI(this);
+
     private Stage stage;
-    private Label statusLabel, playersLabel, playerIDLabel, servidorIPLabel;
+    private Label statusLabel = new Label("");
+    private Label playersLabel = new Label("");
+    private Label playerIDLabel = new Label("");
+    private Label servidorIPLabel = new Label("");
 
     private GameServer gameServer;
     private ClientSideConnection clientSideConnection;
@@ -61,8 +66,12 @@ public class App extends Application {
         
         App.this.setPlayers(new ArrayList<>());
 
-        App.this.setSceneFXML("Lobby");
-        
+        // if(isServer) {
+        //     App.this.preGameGUI.showServerScreen();
+        // } else {
+        //     App.this.preGameGUI.showClientScreen();
+        // }
+        this.setSceneFXML("Lobby");
         this.gameState = 1;
         this.clientSideConnection = new ClientSideConnection(ip, porta);
         this.listenerLobby = new Thread(new listenerLobby());
@@ -72,6 +81,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+    
 
         // gameState = 0 -> jogo ainda não começou, não se sabe se o usuário quer criar
         // um servidor ou conectar um usuário
@@ -84,11 +94,11 @@ public class App extends Application {
         this.stage = primaryStage;
 
         this.gameState = 0;
-        // this.menuGUI.showMenu();
+        //this.menuGUI.showMenu();
 
         
 
-        App.this.setSceneFXML("MenuScene");
+        App.this.setSceneFXML("Menu");
         
         this.stage.show();
         
@@ -98,19 +108,19 @@ public class App extends Application {
     public void setSceneFXML(String sceneName) {
         try {
             Parent root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/" + sceneName + ".fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/" + sceneName + "Scene.fxml"));
             root = fxmlLoader.load();
 
             switch(sceneName) {
-                case "MenuScene":
-                    MenuSceneController menuController = fxmlLoader.getController();
+                case "Menu":
+                    MenuController menuController = fxmlLoader.getController();
                     menuController.setApp(this);
                     break;
-                case "LobbyScene":
+                case "Lobby":
                     LobbyController lobbyController = fxmlLoader.getController();
                     lobbyController.setApp(this);
                     break;
-                case "EndGameScene":
+                case "EndGame":
                     EndGameController controllerEndGameGUI = fxmlLoader.getController();
                     controllerEndGameGUI.setApp(this);
                     break;
@@ -121,15 +131,13 @@ public class App extends Application {
             Platform.runLater(() -> {
                 this.getStage().setScene(scene);
             });
-
-            //this.getStage().setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
-    
-    private void updatePreGameLabels() {
+
+    private void updateLobbyLabels() {
 
         String statusText = isServer ? ("Esperando mais players") : "Esperando host iniciar o jogo";
         this.statusLabel.setText("Status: " + statusText);
@@ -165,7 +173,7 @@ public class App extends Application {
 
                             @Override
                             public void run() {
-                                App.this.updatePreGameLabels();
+                                App.this.updateLobbyLabels();
                             }
                             
                         });
@@ -199,7 +207,8 @@ public class App extends Application {
                         players.get(playerToMove - 1).setCurrentX(Math.min(250 ,players.get(playerToMove - 1).getX() + (attack) * CAR_SPEED));
                         //verifica se o jogador chegou na linha de chegada e encerra o jogo
                         if ((players.get(playerToMove - 1).currentX) >= 250 ){
-                            setSceneFXML("EndGameScene");
+                            //setSceneFXML("EndGame");
+                            //this.app.endGameGUI.show();
                         }
                         
                     } else {

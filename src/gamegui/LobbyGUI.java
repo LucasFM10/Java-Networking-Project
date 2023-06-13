@@ -9,10 +9,10 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
-public class PreGameGUI {
+public class LobbyGUI {
     App app;
 
-    public PreGameGUI(App app) {
+    public LobbyGUI(App app) {
         this.app = app;
     }
 
@@ -50,7 +50,7 @@ public class PreGameGUI {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                PreGameGUI.this.app.getStage().setScene(new Scene(serverLobbyScreen, 400, 300));
+                LobbyGUI.this.app.getStage().setScene(new Scene(serverLobbyScreen, 400, 300));
             }
         });
     }
@@ -68,7 +68,7 @@ public class PreGameGUI {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                PreGameGUI.this.app.getStage().setScene(new Scene(clientLobbyScreen, 400, 300));
+                LobbyGUI.this.app.getStage().setScene(new Scene(clientLobbyScreen, 400, 300));
             }
         });
     }

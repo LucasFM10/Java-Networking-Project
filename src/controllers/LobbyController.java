@@ -1,6 +1,7 @@
 package controllers;
 
 import application.App;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
@@ -24,13 +25,20 @@ public class LobbyController {
 
     @FXML
     public void initialize() {
-        // inicialize aqui seus componentes, se necessário
+        while (true) {
+            
+        }
     }
 
     @FXML
     public void startGame() {
         this.app.getGameServer().endConnections();
         System.out.println("Jogo iniciado");
+    }
+
+    @FXML
+    public void changePlayerLabel(ActionEvent event) {
+        playerIDLabel.setText("ooooooo");
     }
 
 }

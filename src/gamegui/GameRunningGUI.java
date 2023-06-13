@@ -2,21 +2,31 @@ package gamegui;
 
 import application.*;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.util.Duration;
 
 public class GameRunningGUI {
 
     App app;
+    boolean xPressed = false;
 
     public GameRunningGUI(App app) {
         this.app = app;
@@ -24,22 +34,54 @@ public class GameRunningGUI {
 
     public void show() {
 
+        Label countdownLabel = new Label();
+        countdownLabel.setFont(new Font("Arial", 50));  // Define a fonte e o tamanho do texto na label
+        VBox layout = new VBox(10);
+        layout.setAlignment(Pos.CENTER);  // Centraliza os itens no VBox
+        layout.getChildren().add(countdownLabel);
+        Scene scene = new Scene(layout, 300, 200);
+
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                GameRunningGUI.this.app.getStage().setScene(scene);
+            }
+        });
+
+        IntegerProperty countdownSeconds = new SimpleIntegerProperty(5);
+        Timeline countdownTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+            if (countdownSeconds.get() > 0) {
+                countdownLabel.setText(Integer.toString(countdownSeconds.get()));
+                countdownSeconds.set(countdownSeconds.get() - 1);
+            }
+        }));
+
+        countdownTimeline.setCycleCount(countdownSeconds.get() + 1);
+
         Pane gameRunningScreen = new Pane();
 
          // Creating gameRunning scene
         Scene gameRunning = new Scene(gameRunningScreen, App.panelWidth, App.panelHeight);
 
+        int squareSize = 5; // Define the size of your checker pattern squares
+        int numberOfSquares = App.carHeight * this.app.getPlayers().size();
+
         // Draw start line
-        Rectangle startLine = new Rectangle(App.carXPosition, App.panelHeight - App.carYPosition + 20, 10, App.BOX_HEIGHT);
-        startLine.setFill(Color.BLUE);
-        startLine.setStroke(Color.BLACK);
-        gameRunningScreen.getChildren().addAll(startLine);
+        for (int i = 0; i < numberOfSquares; i++) {
+            Rectangle square = new Rectangle(App.carXPosition, App.panelHeight - App.carYPosition + (i * squareSize), 10, squareSize);
+            square.setFill(i % 2 == 0 ? Color.BLACK : Color.WHITE);
+            square.setStroke(Color.BLACK); // Add border to the square
+            gameRunningScreen.getChildren().add(square);
+        }
 
         // Draw finish line
-        Rectangle finish = new Rectangle(App.panelWidth - App.carXPosition - 10, App.panelHeight - App.carYPosition + 20, 10, App.BOX_HEIGHT);
-        finish.setFill(Color.RED);
-        finish.setStroke(Color.BLACK);
-        gameRunningScreen.getChildren().addAll(finish);
+        for (int i = 0; i < numberOfSquares; i++) {
+            Rectangle square = new Rectangle(App.panelWidth - App.carXPosition - 10, App.panelHeight - App.carYPosition + (i * squareSize), 10, squareSize);
+            square.setFill(i % 2 == 0 ? Color.BLACK : Color.WHITE);
+            square.setStroke(Color.BLACK); // Add border to the square
+            gameRunningScreen.getChildren().add(square);
+        }
 
         // Draw players
         for(int i = 0; i < GameRunningGUI.this.app.getPlayers().size(); i++) {
@@ -58,25 +100,27 @@ public class GameRunningGUI {
         box.setFill(lg1);
         gameRunningScreen.getChildren().addAll(box, box.getSlider());
 
-        gameRunning.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        EventHandler<KeyEvent> eventHandler = new EventHandler<KeyEvent>() {
             public void handle(KeyEvent ke) {
-                if(ke.getText().equals("x")) {
+                if(ke.getText().equals("x") && GameRunningGUI.this.xPressed == false) {
                     // print the attack value based on the position of the slider
                     double attackValue = Math.abs(((double) box.getSlider().getEndX() - App.boxInitPosX) - App.BOX_WIDTH / 2) / (App.BOX_WIDTH / 2);
                     // System.out.println("Attack power: " + (1 - attackValue));
 
                     GameRunningGUI.this.app.getClientSideConnection().sendMessage(GameRunningGUI.this.app.getPlayerID() + " " + (0.5 - attackValue));
+                    GameRunningGUI.this.xPressed = true;
                 }
-                
             }
-        });
+        };
+
+        gameRunning.setOnKeyPressed(eventHandler);
 
         // Animation to move the slider
         AnimationTimer slider = new AnimationTimer() {
             private long lastUpdate = 0 ;
             @Override
             public void handle(long now) {
-                if (now - lastUpdate <= 17_000_000) {
+                if (now - lastUpdate <= 5_000_000) {
                     return;
                 }
                 lastUpdate = now ;
@@ -89,6 +133,7 @@ public class GameRunningGUI {
                     box.setSliderPosX(box.getSliderPosX()- App.SLIDER_SPEED);
                     if (box.getSlider().getEndX() <= + App.boxInitPosX) {
                         box.setMovingRight(true);
+                        GameRunningGUI.this.xPressed = false;
                     }
                 }
                 
@@ -101,12 +146,16 @@ public class GameRunningGUI {
 
         slider.start();
 
-        Platform.runLater(new Runnable() {
+        countdownTimeline.setOnFinished(e -> {
+            Platform.runLater(new Runnable() {
 
             @Override
             public void run() {
                 GameRunningGUI.this.app.getStage().setScene(gameRunning);
             }
+            });
         });
+
+        countdownTimeline.play();
     }
 }

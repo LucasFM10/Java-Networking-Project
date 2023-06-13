@@ -22,7 +22,7 @@ public class EndGameController {
     
     @FXML
     void voltarAoMenu(ActionEvent event) {
-        this.app.setSceneFXML("MenuScene");
+        this.app.setSceneFXML("Menu");
     }
     
     App app;

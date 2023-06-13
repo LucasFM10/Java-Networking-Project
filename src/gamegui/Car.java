@@ -7,7 +7,7 @@ public class Car extends ImageView {
 
     double speed;
     double currentX, currentY;
-    String nickName;
+    public String nickName;
     
     public double getCurrentX() {
         return currentX;

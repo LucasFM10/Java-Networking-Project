@@ -33,7 +33,7 @@ public class MenuGUI {
         VBox menuVBox = new VBox();
 
         // Título do jogo
-        Text titleText = new Text("Corrida dos Unicórnios");
+        Text titleText = new Text("Corrida Maluca");
         titleText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
 
         // Botões

@@ -62,7 +62,7 @@ public class GameRunningGUI {
         Pane gameRunningScreen = new Pane();
 
          // Creating gameRunning scene
-        Scene gameRunning = new Scene(gameRunningScreen, App.panelWidth, App.panelHeight);
+        Scene gameRunning = new Scene(gameRunningScreen, App.panelWidth, App.panelHeight + App.carHeight * this.app.getPlayers().size());
 
         int squareSize = 5; // Define the size of your checker pattern squares
         int numberOfSquares = App.carHeight * this.app.getPlayers().size() / squareSize;
@@ -164,14 +164,15 @@ public class GameRunningGUI {
             }
             });
         });
-        Platform.runLater(new Runnable() {
+        
+        // Platform.runLater(new Runnable() {
 
-            @Override
-            public void run() {
-                GameRunningGUI.this.app.getStage().setScene(gameRunning);
-            }
-            });
+        //     @Override
+        //     public void run() {
+        //         GameRunningGUI.this.app.getStage().setScene(gameRunning);
+        //     }
+        // });
 
-        //            countdownTimeline.play();
+        countdownTimeline.play();
     }
 }

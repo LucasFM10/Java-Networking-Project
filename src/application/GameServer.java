@@ -192,7 +192,7 @@ public class GameServer {
             try {
                 string = bufferedReader.readLine();
             } catch (IOException ex) {
-                System.out.println("IOException from receiveButtonNumber() in ServerSideConection." + ex);
+                System.out.println("IOException from receiveMessage() in ServerSideConection." + ex);
             }
             return string;
         }

@@ -21,7 +21,7 @@ public class App extends Application {
     public static final int BOX_WIDTH = panelWidth / 2;
     public static final int BOX_HEIGHT = 50;
     public static final int SLIDER_SPEED = 4;
-    public static final int CAR_SPEED = 200;
+    public static final int CAR_SPEED = 40;
     public static final int CAR_DIST = 30;
     public static final int carXPosition = 100;
     public static final int carYPosition = 115;
@@ -34,7 +34,6 @@ public class App extends Application {
     public EndGameGUI endGameGUI = new EndGameGUI(this);
 
     private List<Car> players;
-    private List<String> nickNames;
 
     private int playerID;
     public String nickName, ip, porta;
@@ -43,7 +42,6 @@ public class App extends Application {
     private Label statusLabel = new Label("");
     private Label playersLabel = new Label("");
     private Label playerIDLabel = new Label("");
-    private Label servidorIPLabel = new Label("");
 
     public GameServer gameServer;
     private ClientSideConnection clientSideConnection;
@@ -181,10 +179,11 @@ public class App extends Application {
                         players.get(playerToMove - 1).setCurrentX(Math.min(App.panelWidth - App.carXPosition - App.carWidth - 5
                             ,players.get(playerToMove - 1).getX() + (attack) * CAR_SPEED));
                         //verifica se o jogador chegou na linha de chegada e encerra o jogo
-                        if ((players.get(playerToMove - 1).getCurrentX()) >= 250 ){
+                        if ((players.get(playerToMove - 1).getCurrentX()) >= App.panelWidth - App.carXPosition - App.carWidth - 5 ){
                             //setSceneFXML("EndGame");
                             App.this.endGameGUI.show();
-                            App.this.endGameGUI.setFirstPlace(playerToMove + "");
+                            App.this.endGameGUI.setFirstPlace(players.get(playerToMove - 1).nickName + "");
+                            
                             //try {
 								//gameServer.getServerSocket().close();
 							//} catch (IOException e) {

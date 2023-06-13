@@ -25,13 +25,13 @@ public class EndGameGUI {
 
     public void show() {
         firstPlaceLabel = new Label("1st Place: -");
-        secondPlaceLabel = new Label("2nd Place: -");
-        thirdPlaceLabel = new Label("3rd Place: -");
+        //secondPlaceLabel = new Label("2nd Place: -");
+        //thirdPlaceLabel = new Label("3rd Place: -");
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(firstPlaceLabel, secondPlaceLabel, thirdPlaceLabel);
+        root.getChildren().addAll(firstPlaceLabel);
 
 
         Button backButton = new Button("Voltar ao Menu");
@@ -73,31 +73,28 @@ public class EndGameGUI {
                 this.app.getClientSideConnection().closeConnection();
             }
 
-            // App newApp = new App();
+            App newApp = new App();
 
             //EndGameGUI.this.app.stage = appStage;
-            EndGameGUI.this.app.menuGUI = new MenuGUI(EndGameGUI.this.app);
-            EndGameGUI.this.app.preGameGUI = new LobbyGUI(EndGameGUI.this.app);
-            EndGameGUI.this.app.gameRunningGUI = new GameRunningGUI(EndGameGUI.this.app);
-            EndGameGUI.this.app.endGameGUI = new EndGameGUI(EndGameGUI.this.app);
+            EndGameGUI.this.app.menuGUI = new MenuGUI(newApp);
+            EndGameGUI.this.app.preGameGUI = new LobbyGUI(newApp);
+            EndGameGUI.this.app.gameRunningGUI = new GameRunningGUI(newApp);
+            EndGameGUI.this.app.endGameGUI = new EndGameGUI(newApp);
 
-            EndGameGUI.this.app.isServer = false;
+            // EndGameGUI.this.app.isServer = false;
             
-            EndGameGUI.this.app.gameState = 0;
-            EndGameGUI.this.app.menuGUI.showMenu();
-            EndGameGUI.this.app.stage.show();
+            // EndGameGUI.this.app.gameState = 0;
+            newApp.start(EndGameGUI.this.app.stage);
+            // EndGameGUI.this.app.menuGUI.showMenu();
+            // EndGameGUI.this.app.stage.show();
 
     }
 
     public void setFirstPlace(String playerName) {
-        firstPlaceLabel.setText("1st Place: " + playerName);
+        firstPlaceLabel.setText("O vencedor é: " + playerName);
     }
 
-    public void setSecondPlace(String playerName) {
-        secondPlaceLabel.setText("2nd Place: " + playerName);
-    }
+    
 
-    public void setThirdPlace(String playerName) {
-        thirdPlaceLabel.setText("3rd Place: " + playerName);
-    }
+    
 }

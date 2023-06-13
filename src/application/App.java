@@ -2,23 +2,18 @@ package application;
 
 
 import gamegui.*;
-import controllers.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 public class App extends Application {
 
-    public static final int panelWidth = 300;
+    public static final int panelWidth = 600;
     public static final int panelHeight = 200;
 
     public static final int boxInitPosX = panelWidth / 4;
@@ -26,35 +21,37 @@ public class App extends Application {
     public static final int BOX_WIDTH = panelWidth / 2;
     public static final int BOX_HEIGHT = 50;
     public static final int SLIDER_SPEED = 4;
-    public static final int CAR_SPEED = 40;
+    public static final int CAR_SPEED = 200;
     public static final int CAR_DIST = 30;
-    public static final int carXPosition = 50;
+    public static final int carXPosition = 100;
     public static final int carYPosition = 115;
     public static final int carWidth = 20;
     public static final int carHeight = 30;
 
     public MenuGUI menuGUI = new MenuGUI(this);
-    private LobbyGUI preGameGUI = new LobbyGUI(this);
-    private GameRunningGUI gameRunningGUI = new GameRunningGUI(this);
-    private EndGameGUI endGameGUI = new EndGameGUI(this);
+    public LobbyGUI preGameGUI = new LobbyGUI(this);
+    public GameRunningGUI gameRunningGUI = new GameRunningGUI(this);
+    public EndGameGUI endGameGUI = new EndGameGUI(this);
 
     private List<Car> players;
-    private int playerID;
-    public String nickName;
+    private List<String> nickNames;
 
-    private Stage stage;
+    private int playerID;
+    public String nickName, ip, porta;
+
+    public Stage stage;
     private Label statusLabel = new Label("");
     private Label playersLabel = new Label("");
     private Label playerIDLabel = new Label("");
     private Label servidorIPLabel = new Label("");
 
-    private GameServer gameServer;
+    public GameServer gameServer;
     private ClientSideConnection clientSideConnection;
-    private int gameState = 0;
+    public int gameState = 0;
 
     // 0 -> client
     // 1 -> server
-    private boolean isServer = false;
+    public boolean isServer = false;
 
     private Thread listenerLobby, listenerUpdateGame;
 
@@ -72,9 +69,11 @@ public class App extends Application {
 
         if(isServer) {
             App.this.preGameGUI.showServerScreen();
+            while(this.gameServer == null) System.out.println("esperando");
         } else {
             App.this.preGameGUI.showClientScreen();
         }
+
         this.gameState = 1;
         this.clientSideConnection = new ClientSideConnection(ip, porta);
         this.listenerLobby = new Thread(new listenerLobby());
@@ -104,44 +103,12 @@ public class App extends Application {
 
     }
 
-    public void setSceneFXML(String sceneName) {
-        try {
-            Parent root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/" + sceneName + "Scene.fxml"));
-            root = fxmlLoader.load();
-
-            switch(sceneName) {
-                case "Menu":
-                    MenuController menuController = fxmlLoader.getController();
-                    menuController.setApp(this);
-                    break;
-                case "Lobby":
-                    LobbyController lobbyController = fxmlLoader.getController();
-                    lobbyController.setApp(this);
-                    break;
-                case "EndGame":
-                    EndGameController controllerEndGameGUI = fxmlLoader.getController();
-                    controllerEndGameGUI.setApp(this);
-                    break;
-            }
-
-            Scene scene = new Scene(root);
-            
-            Platform.runLater(() -> {
-                this.getStage().setScene(scene);
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private void updateLobbyLabels() {
 
         
 
-        String statusText = isServer ? ("Esperando mais players") : "Esperando host iniciar o jogo";
-        this.statusLabel.setText("Status: " + statusText);
+        String statusText = isServer ? ("está esperando por mais players\nno ip " + this.ip + " e na porta " + this.porta) : "está esperando o host iniciar o jogo";
+        this.statusLabel.setText("Status: " + this.nickName + " " + statusText);
         this.playersLabel.setText("Número de Jogadores: " + this.players.size());
         this.playerIDLabel.setText("Player: #" + this.playerID);
     }
@@ -156,20 +123,24 @@ public class App extends Application {
                 String string;
                 if ((string = clientSideConnection.receiveMessage()) != null) {
 
+                    System.out.println(string);
+
                     if(string.split(" ")[3].equals("não")) {
 
                         App.this.setGameState(2);
                         break;
                     }
 
-                    System.out.println(string);
-
                     if (playerID == 0) {
-                        playerID = Integer.parseInt(string.split(" ")[6]);
+                        App.this.playerID = Integer.parseInt(string.split(" ")[6]);
+                        App.this.getClientSideConnection().playerID = App.this.playerID;
+
+                        App.this.clientSideConnection.sendMessage("nickname = " + nickName);
                     }
 
                     for (int i = players.size(); i < Integer.parseInt(string.split(" ")[3]); i++) {
-                        players.add(i, new Car());
+                        players.add(i, new Car(string.split(" ")[4 + i]));
+                        System.out.println(string.split(" ")[4 + i]);
                         Platform.runLater(new Runnable() {
 
                             @Override
@@ -179,6 +150,7 @@ public class App extends Application {
                             
                         });
                     }
+
                 }
             }
 
@@ -195,7 +167,9 @@ public class App extends Application {
                 
             while (true) {
                 String string;
+                
                 if((string = clientSideConnection.receiveMessage())!=null) {
+                    
                     System.out.println(string);
 
                     if(gameState == 2) {
@@ -205,9 +179,10 @@ public class App extends Application {
                         playerToMove = Integer.parseInt(string.split(" ")[2]);
                         attack = Double.parseDouble(string.split(" ")[3]);
                         System.out.println("Player #" + playerToMove + " hit " + attack + " attack value.");
-                        players.get(playerToMove - 1).setCurrentX(Math.min(250 ,players.get(playerToMove - 1).getX() + (attack) * CAR_SPEED));
+                        players.get(playerToMove - 1).setCurrentX(Math.min(App.panelWidth - App.carXPosition - App.carWidth - 5
+                            ,players.get(playerToMove - 1).getX() + (attack) * CAR_SPEED));
                         //verifica se o jogador chegou na linha de chegada e encerra o jogo
-                        if ((players.get(playerToMove - 1).currentX) >= 250 ){
+                        if ((players.get(playerToMove - 1).getCurrentX()) >= 250 ){
                             //setSceneFXML("EndGame");
                             App.this.endGameGUI.show();
                             App.this.endGameGUI.setFirstPlace(playerToMove + "");
@@ -230,6 +205,14 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
     public Label getStatusLabel() {
@@ -335,5 +318,20 @@ public class App extends Application {
     public void setListenerUpdateGame(Thread listenerUpdateGame) {
         this.listenerUpdateGame = listenerUpdateGame;
     }
-    
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getPorta() {
+        return porta;
+    }
+
+    public void setPorta(String porta) {
+        this.porta = porta;
+    }
 }

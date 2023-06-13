@@ -19,7 +19,6 @@ public class EndGameGUI {
     private Label secondPlaceLabel;
     private Label thirdPlaceLabel;
 
-
     public EndGameGUI(App app){
         this.app = app;
     }
@@ -34,12 +33,13 @@ public class EndGameGUI {
         root.setAlignment(Pos.CENTER);
         root.getChildren().addAll(firstPlaceLabel, secondPlaceLabel, thirdPlaceLabel);
 
+
         Button backButton = new Button("Voltar ao Menu");
         backButton.setOnAction(event -> {
             // Lógica para voltar ao menu aqui
 
-                EndGameGUI.this.app.menuGUI.showMenu();
-            
+            EndGameGUI.this.app.endGameGUI.voltarAoMenu();
+
         });
 
             System.out.println("Voltando ao menu...");
@@ -62,6 +62,26 @@ public class EndGameGUI {
 
 
         //this.app.getStage().setScene(new Scene(root, 400, 300));
+    }
+
+    
+    public void voltarAoMenu(){
+
+            if(this.app.isServer)
+                this.app.getGameServer().closeConnection(this.app.gameServer.esteServerSideConnection);
+            else{
+                this.app.getClientSideConnection().closeConnection();
+            }
+
+            //EndGameGUI.this.app.stage = appStage;
+            EndGameGUI.this.app.menuGUI = new MenuGUI(EndGameGUI.this.app);
+            EndGameGUI.this.app.preGameGUI = new LobbyGUI(EndGameGUI.this.app);
+            EndGameGUI.this.app.gameRunningGUI = new GameRunningGUI(EndGameGUI.this.app);
+            EndGameGUI.this.app.endGameGUI = new EndGameGUI(EndGameGUI.this.app);
+            EndGameGUI.this.app.gameState = 0;
+            EndGameGUI.this.app.menuGUI.showMenu();
+            EndGameGUI.this.app.stage.show();
+
     }
 
     public void setFirstPlace(String playerName) {

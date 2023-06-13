@@ -1,4 +1,4 @@
-package application;
+package gamegui;
 
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Line;

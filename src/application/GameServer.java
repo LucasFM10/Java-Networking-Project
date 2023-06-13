@@ -11,6 +11,9 @@ public class GameServer {
     private int serverState = 0;
     private boolean waitingConnections = true;
     private List<ServerSideConnection> players;
+    public String s = "";
+
+    public ServerSideConnection esteServerSideConnection = null;
 
     public ServerSocket getServerSocket() {
         return serverSocket;
@@ -56,6 +59,8 @@ public class GameServer {
         }
     }
 
+
+
     public void acceptConnections() {
         try {
             System.out.println("Waiting for connections...");
@@ -70,6 +75,7 @@ public class GameServer {
                         System.out.println("Player #" + (i) + " has connected.");
                         players.add(serverSideConnection);
                         Thread t = new Thread(serverSideConnection);
+                        esteServerSideConnection = serverSideConnection;
                         t.start();
                     } catch (IOException e) {
                         // Erro de aceitação do socket
@@ -92,6 +98,16 @@ public class GameServer {
             players.get(i).sendMessage("Conexões não são mais aceitas e  jogo está começando.");
     }
 
+    public void closeConnection(ServerSideConnection serverSideConnection) {
+            try {
+                serverSocket.close();
+                serverSideConnection.closeConnection();
+                System.out.println("Connection closed.");
+            } catch (IOException ex) {
+                System.out.println("IOException on closeConnect() in ServerSideConnection.");
+            }
+        }
+
     private class ServerSideConnection implements Runnable {
 
         private Socket socket;
@@ -102,10 +118,12 @@ public class GameServer {
         private PrintStream printStream;
 
         private int playerID;
+        private String nickName;
 
         public ServerSideConnection(Socket s, int id) {
             this.socket = s;
             this.playerID = id;
+
             try {
 
                 bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -118,26 +136,36 @@ public class GameServer {
         @Override
         public void run() {
             try {
-
                 System.out.println("Thread ativa: " + Thread.currentThread().getName());
 
-                String string;
-
                 for(int i = 0; i < players.size(); i++) {
-                    players.get(i).sendMessage("NumJogadores: " + players.size() + " Jogador: # " + playerID + " conectado");
+                    players.get(i).sendMessage("NumJogadores: " + players.size() + " Jogador: # " + playerID + " " + s);
                 }
+
                 while(true){
-                    if((string = receiveMessage()) != null) {
-                        System.out.println(string);
-                        // sendMessage("Recebi sua mensagem, jogador #" + string.charAt(8) + "!");
-                        double attack;
-                        int playerToMove;
-                        if(serverState == 1){
-                            playerToMove = Integer.parseInt(string.split(" ")[3]);
-                            attack = Double.parseDouble(string.split(" ")[4]);
-                            for(int i = 0; i < players.size(); i++) {
-                                players.get(i).sendMessage(playerToMove + " " + attack);
+                    String string2;
+                    if((string2 = receiveMessage()) != null) {
+                        
+                        if(string2.split(" ")[3].equals("nickname")) {
+                            players.get(players.size() - 1).nickName = string2.split(" ")[5];
+                            System.out.println("# " + playerID + " conectado como " + players.get(players.size() - 1).nickName);
+                            
+                            s = s + players.get(players.size() - 1).nickName + " ";
+
+                            System.out.println(s);
+                        } else {
+
+                            // sendMessage("Recebi sua mensagem, jogador #" + string.charAt(8) + "!");
+                            double attack;
+                            int playerToMove;
+                            if(serverState == 1){
+                                playerToMove = Integer.parseInt(string2.split(" ")[3]);
+                                attack = Double.parseDouble(string2.split(" ")[4]);
+                                for(int i = 0; i < players.size(); i++) {
+                                    players.get(i).sendMessage(playerToMove + " " + attack);
+                                }
                             }
+
                         }
                     }
                 }
@@ -167,15 +195,15 @@ public class GameServer {
             return string;
         }
 
-        // public void closeConnection() {
-        //     try {
-        //         serverSocket.close();
-        //         socket.close();
-        //         System.out.println("Connection closed.");
-        //     } catch (IOException ex) {
-        //         System.out.println("IOException on closeConnect() in ServerSideConnection.");
-        //     }
-        // }
+        public void closeConnection() {
+            try {
+
+                socket.close();
+                System.out.println("Connection closed.");
+            } catch (IOException ex) {
+                System.out.println("IOException on closeConnect() in ServerSideConnection.");
+            }
+        }
         
     }
 }

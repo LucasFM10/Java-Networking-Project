@@ -83,17 +83,25 @@ public class GameRunningGUI {
             gameRunningScreen.getChildren().add(square);
         }
 
+
+        Label nameLabels[] = new Label[this.app.getPlayers().size()];
+
         // Draw players
         for(int i = 0; i < GameRunningGUI.this.app.getPlayers().size(); i++) {
-            GameRunningGUI.this.app.getPlayers().set(i, new Car(new Image("/assets/car" + ((i % 3) + 1) + ".png"), App.CAR_SPEED, App.carXPosition, App.carYPosition + i * App.CAR_DIST, App.carWidth, App.carHeight));
-            gameRunningScreen.getChildren().addAll(GameRunningGUI.this.app.getPlayers().get(i));
+            GameRunningGUI.this.app.getPlayers().set(i, new Car(new Image("/assets/car" + ((i % 3) + 1) + ".png"), App.CAR_SPEED, App.carXPosition, App.carYPosition + i * App.CAR_DIST, App.carWidth, App.carHeight, this.app.getPlayers().get(i).nickName));
+
+            nameLabels[i] = new Label(this.app.getPlayers().get(i).nickName);
+            nameLabels[i].setLayoutX(App.carXPosition - 55);
+            nameLabels[i].setLayoutY(App.carYPosition + i * App.CAR_DIST);
+            
+            gameRunningScreen.getChildren().addAll(GameRunningGUI.this.app.getPlayers().get(i), nameLabels[i]);
         }
 
         Stop[] stops = new Stop[] { new Stop(0, Color.RED), new Stop(0.75, Color.YELLOW), new Stop(1, Color.GREEN)};
         LinearGradient lg1 = new LinearGradient(0, 0, 0.5, 0, true, CycleMethod.REFLECT, stops);
 
         // Draw the box
-        Box box = new Box(App.panelWidth / 2 - App.BOX_WIDTH / 2, App.boxInitPosY, App.BOX_WIDTH, App.BOX_HEIGHT, App.SLIDER_SPEED);
+        Box box = new Box(App.panelWidth / 2 - App.BOX_WIDTH / 4, App.boxInitPosY, App.BOX_WIDTH / 2, App.BOX_HEIGHT, App.SLIDER_SPEED);
         box.setFill(Color.TRANSPARENT);
         box.setStroke(Color.BLACK);
         box.getSlider().setStroke(Color.BLACK);
@@ -126,12 +134,13 @@ public class GameRunningGUI {
                 lastUpdate = now ;
                 if (box.isMovingRight()) {
                     box.setSliderPosX(box.getSliderPosX() + App.SLIDER_SPEED);
-                    if (box.getSlider().getEndX() >= App.BOX_WIDTH + App.boxInitPosX) {
+                    if (box.getSlider().getEndX() >= App.BOX_WIDTH / 2 + App.panelWidth / 2 - App.BOX_WIDTH / 4) {
                         box.setMovingRight(false);
+                        GameRunningGUI.this.xPressed = false;
                     }
                 } else {
                     box.setSliderPosX(box.getSliderPosX()- App.SLIDER_SPEED);
-                    if (box.getSlider().getEndX() <= + App.boxInitPosX) {
+                    if (box.getSlider().getEndX() <= App.panelWidth / 2 - App.BOX_WIDTH / 4) {
                         box.setMovingRight(true);
                         GameRunningGUI.this.xPressed = false;
                     }

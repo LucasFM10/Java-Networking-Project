@@ -13,7 +13,7 @@ public class ClientSideConnection {
     private BufferedReader bufferedReader;
     private PrintStream printStream;
 
-    private int playerID;
+    public int playerID;
 
     public ClientSideConnection (String ip, int porta) {
         System.out.println("---Client---");
@@ -25,7 +25,6 @@ public class ClientSideConnection {
 
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printStream = new PrintStream(socket.getOutputStream());
-            playerID = dataInputStream.readInt();
             // System.out.println("Connected to server as Player #" + playerID + ".");
             // this.sendMessage("Olá, servidor!");
         } catch(IOException ex) {

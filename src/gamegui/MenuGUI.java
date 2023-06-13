@@ -70,6 +70,7 @@ public class MenuGUI {
         gridPane.setPadding(new Insets(20));
 
         TextField portaTextField = new TextField();
+        portaTextField.setText("8888");
         portaTextField.setPrefWidth(100); // Definindo a largura preferencial do TextField
 
         gridPane.add(new Text("Porta:"), 0, 0);
@@ -88,7 +89,19 @@ public class MenuGUI {
                 if (validarPorta(porta)) {
                     if (verificarPortaDisponivel(Integer.parseInt(porta))) {
 
-                        this.app.setServer(true);
+                        exibirDialogoNickname(e);
+
+                        try {
+                            InetAddress ip = InetAddress.getLocalHost();
+                            System.out.println("O endereço IP da máquina local é: " + ip.getHostAddress());
+
+                            this.app.setServer(true);
+                            this.app.setIp(ip.getHostAddress());
+                        } catch (UnknownHostException ex) {
+                            ex.printStackTrace();
+                        }
+
+                        this.app.setPorta(porta);
 
                         Thread createServer = new Thread(new Runnable() {
                             @Override
@@ -124,7 +137,9 @@ public class MenuGUI {
         gridPane.setPadding(new Insets(20));
 
         TextField ipTextField = new TextField();
+        ipTextField.setText("127.0.1.1");
         TextField portaTextField = new TextField();
+        portaTextField.setText("8888");
 
         gridPane.add(new Text("IP:"), 0, 0);
         gridPane.add(ipTextField, 1, 0);
@@ -144,6 +159,8 @@ public class MenuGUI {
 
                 if (validarIP(ip) && validarPorta(porta)) {
 
+                    exibirDialogoNickname(e);
+
                     Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -161,6 +178,38 @@ public class MenuGUI {
         });
     }
 
+    private void exibirDialogoNickname(ActionEvent e) {
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+
+        TextField nickNameTextField = new TextField();
+
+        gridPane.add(new Text("Nickname:"), 0, 0);
+        gridPane.add(nickNameTextField, 1, 0);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Corrida Maluca");
+        alert.setHeaderText(null);
+        alert.getDialogPane().setContent(gridPane);
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                String nickName = nickNameTextField.getText().trim();
+
+                if (validarNickname(nickName)) {
+                    this.app.setNickName(nickName);
+                } else {
+                    exibirMensagemErro("Digite um nickname válido.");
+                    exibirDialogoNickname(e); // Chamada recursiva para exibir o diálogo novamente
+                }
+            }
+        });
+    }
+
     private boolean validarIP(String ip) {
         // Utilize uma expressão regular para verificar se o IP é válido
         String ipRegex = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
@@ -168,6 +217,10 @@ public class MenuGUI {
                 + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
                 + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
         return ip.matches(ipRegex);
+    }
+    
+    private boolean validarNickname(String nickNameString) {
+        return nickNameString.length() < 20;
     }
 
     private boolean validarPorta(String porta) {

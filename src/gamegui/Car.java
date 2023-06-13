@@ -1,3 +1,5 @@
+package gamegui;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -5,6 +7,7 @@ public class Car extends ImageView {
 
     double speed;
     double currentX, currentY;
+    String nickName;
     
     public double getCurrentX() {
         return currentX;
@@ -22,11 +25,11 @@ public class Car extends ImageView {
         this.currentY = currentY;
     }
 
-    public Car() {
-
+    public Car(String nickName) {
+        this.nickName = nickName;
     }
 
-    public Car(Image image, double speed, double positionX, double positionY, double width, double height) {
+    public Car(Image image, double speed, double positionX, double positionY, double width, double height, String nickName) {
         this.setImage(image);
         this.speed = speed;
         this.setX(positionX);
@@ -35,6 +38,7 @@ public class Car extends ImageView {
         this.setFitHeight(height);
         this.currentX = positionX;
         this.currentY = positionX;
+        this.nickName = nickName;
     }
 
     public double getSpeed() {

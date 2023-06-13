@@ -1,5 +1,10 @@
+package gamegui;
+
+import application.*;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -15,13 +20,17 @@ import javafx.scene.text.TextAlignment;
 import java.io.IOException;
 import java.net.*;
 
-public class GUIMenu extends VBox {
+public class MenuGUI {
 
     App app;
 
-    public GUIMenu(App app) {
-
+    public MenuGUI(App app) {
         this.app = app;
+    }
+
+    public void showMenu() {
+
+        VBox menuVBox = new VBox();
 
         // Título do jogo
         Text titleText = new Text("Corrida dos Unicórnios");
@@ -32,13 +41,13 @@ public class GUIMenu extends VBox {
         conectarButton.setPrefSize(100, 100);
         conectarButton.setWrapText(true);
         conectarButton.setTextAlignment(TextAlignment.CENTER);
-        conectarButton.setOnAction(e -> exibirDialogoConectar());
+        conectarButton.setOnAction(e -> exibirDialogoConectar(e));
 
         Button criarServidorButton = new Button("Criar\nServidor");
         criarServidorButton.setPrefSize(100, 100);
         criarServidorButton.setWrapText(true);
         criarServidorButton.setTextAlignment(TextAlignment.CENTER);
-        criarServidorButton.setOnAction(e -> exibirDialogoCriarServidor());
+        criarServidorButton.setOnAction(e -> exibirDialogoCriarServidor(e));
 
         // Layout dos botões
         HBox buttonBox = new HBox(20);
@@ -46,19 +55,22 @@ public class GUIMenu extends VBox {
         buttonBox.getChildren().addAll(conectarButton, criarServidorButton);
 
         // Layout principal
-        this.setSpacing(20);
-        this.setPadding(new Insets(20));
-        this.setAlignment(Pos.CENTER);
-        this.getChildren().addAll(titleText, buttonBox);
+        menuVBox.setSpacing(20);
+        menuVBox.setPadding(new Insets(20));
+        menuVBox.setAlignment(Pos.CENTER);
+        menuVBox.getChildren().addAll(titleText, buttonBox);
+
+        this.app.getStage().setScene(new Scene(menuVBox, 400, 300));
     }
 
-    private void exibirDialogoCriarServidor() {
+    public void exibirDialogoCriarServidor(ActionEvent e) {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(20));
 
         TextField portaTextField = new TextField();
+        portaTextField.setText("8888");
         portaTextField.setPrefWidth(100); // Definindo a largura preferencial do TextField
 
         gridPane.add(new Text("Porta:"), 0, 0);
@@ -76,33 +88,58 @@ public class GUIMenu extends VBox {
 
                 if (validarPorta(porta)) {
                     if (verificarPortaDisponivel(Integer.parseInt(porta))) {
-                        Thread t = new Thread(new Runnable() {
+
+                        exibirDialogoNickname(e);
+
+                        try {
+                            InetAddress ip = InetAddress.getLocalHost();
+                            System.out.println("O endereço IP da máquina local é: " + ip.getHostAddress());
+
+                            this.app.setServer(true);
+                            this.app.setIp(ip.getHostAddress());
+                        } catch (UnknownHostException ex) {
+                            ex.printStackTrace();
+                        }
+
+                        this.app.setPorta(porta);
+
+                        Thread createServer = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                app.createServer(Integer.parseInt(porta));
+                                MenuGUI.this.app.createServer(Integer.parseInt(porta));
                             }
                         });
-                        t.start();
-                        System.out.println("Criar servidor na porta: " + porta);
+                        createServer.start();
+
+                        Thread connectServer = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MenuGUI.this.app.connectToServer("localhost", Integer.parseInt(porta));
+                            }
+                        });
+                        connectServer.start();
+
                     } else {
                         exibirMensagemErro("A porta não está disponível para uso.");
                     }
                 } else {
                     exibirMensagemErro("Digite uma porta válida.");
-                    exibirDialogoCriarServidor(); // Chamada recursiva para exibir o diálogo novamente
+                    exibirDialogoCriarServidor(e); // Chamada recursiva para exibir o diálogo novamente
                 }
             }
         });
     }
 
-    private void exibirDialogoConectar() {
+    private void exibirDialogoConectar(ActionEvent e) {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(20));
 
         TextField ipTextField = new TextField();
+        ipTextField.setText("127.0.1.1");
         TextField portaTextField = new TextField();
+        portaTextField.setText("8888");
 
         gridPane.add(new Text("IP:"), 0, 0);
         gridPane.add(ipTextField, 1, 0);
@@ -122,21 +159,52 @@ public class GUIMenu extends VBox {
 
                 if (validarIP(ip) && validarPorta(porta)) {
 
-
+                    exibirDialogoNickname(e);
 
                     Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            app.connectToServer(ip, Integer.parseInt(porta));
+                            MenuGUI.this.app.connectToServer(ip, Integer.parseInt(porta));
                         }
                     });
                     t.start();
 
-                    
-                    System.out.println("Conectar ao servidor: IP=" + ip + ", Porta=" + porta);
+                    // System.out.println("Conectar ao servidor: IP=" + ip + ", Porta=" + porta);
                 } else {
                     exibirMensagemErro("Digite um IP e uma porta válidos.");
-                    exibirDialogoConectar(); // Chamada recursiva para exibir o diálogo novamente
+                    exibirDialogoConectar(e); // Chamada recursiva para exibir o diálogo novamente
+                }
+            }
+        });
+    }
+
+    private void exibirDialogoNickname(ActionEvent e) {
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(20));
+
+        TextField nickNameTextField = new TextField();
+
+        gridPane.add(new Text("Nickname:"), 0, 0);
+        gridPane.add(nickNameTextField, 1, 0);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Corrida Maluca");
+        alert.setHeaderText(null);
+        alert.getDialogPane().setContent(gridPane);
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                String nickName = nickNameTextField.getText().trim();
+
+                if (validarNickname(nickName)) {
+                    this.app.setNickName(nickName);
+                } else {
+                    exibirMensagemErro("Digite um nickname válido.");
+                    exibirDialogoNickname(e); // Chamada recursiva para exibir o diálogo novamente
                 }
             }
         });
@@ -149,6 +217,10 @@ public class GUIMenu extends VBox {
                 + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
                 + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
         return ip.matches(ipRegex);
+    }
+    
+    private boolean validarNickname(String nickNameString) {
+        return nickNameString.length() < 20;
     }
 
     private boolean validarPorta(String porta) {
@@ -179,5 +251,4 @@ public class GUIMenu extends VBox {
         alert.setContentText(mensagem);
         alert.showAndWait();
     }
-
 }
